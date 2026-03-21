@@ -9,13 +9,13 @@ export default {
       center: true,
       padding: "2rem",
       screens: {
-        "2xl": "1400px",
+        "2xl": "1280px",
       },
     },
     extend: {
       fontFamily: {
-        display: ['"Playfair Display"', 'serif'],
-        body: ['"Source Sans 3"', 'sans-serif'],
+        display: ['"Cormorant Garamond"', 'serif'],
+        body: ['"Outfit"', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -60,6 +60,8 @@ export default {
           light: "hsl(var(--ocean-light))",
           dark: "hsl(var(--ocean-dark))",
         },
+        warm: "hsl(var(--warm))",
+        cream: "hsl(var(--cream))",
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -75,6 +77,14 @@ export default {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        xl: "calc(var(--radius) + 4px)",
+        "2xl": "calc(var(--radius) + 8px)",
+      },
+      boxShadow: {
+        premium: "0 4px 24px -4px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04)",
+        "premium-lg": "0 12px 48px -8px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.04)",
+        "premium-xl": "0 20px 60px -12px rgba(0, 0, 0, 0.15)",
+        glow: "0 0 0 1px hsl(var(--primary) / 0.1), 0 8px 32px -4px hsl(var(--primary) / 0.12)",
       },
       keyframes: {
         "accordion-down": {
