@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
+import { useEffect } from "react";
 
 const links = [
   { to: "/", label: "Home" },
@@ -25,25 +26,32 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
-          ? "bg-card/95 backdrop-blur-sm shadow-md py-3"
-          : "bg-transparent py-5"
+          ? "bg-card/95 backdrop-blur-md shadow-premium py-3"
+          : "bg-transparent py-6"
       }`}
     >
       <div className="container flex items-center justify-between">
-        <Link to="/" className="font-display text-2xl font-bold tracking-tight text-primary">
-          Hotel Saly
+        <Link to="/" className="flex flex-col">
+          <span className="font-display text-2xl md:text-3xl font-semibold tracking-tight text-primary leading-none">
+            Hotel Saly
+          </span>
+          <span className={`font-body text-[10px] tracking-[0.3em] uppercase ${scrolled ? "text-muted-foreground" : "text-foreground/50"}`}>
+            Saly Portudal · Senegal
+          </span>
         </Link>
 
         {/* Desktop */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-10">
           {links.map((l) => (
             <Link
               key={l.to}
               to={l.to}
-              className={`font-body text-sm font-medium tracking-wide uppercase transition-colors hover:text-primary ${
-                location.pathname === l.to ? "text-primary" : scrolled ? "text-foreground" : "text-foreground/80"
+              className={`font-body text-[13px] font-medium tracking-[0.12em] uppercase transition-all duration-200 relative after:absolute after:bottom-[-4px] after:left-0 after:h-[1.5px] after:bg-primary after:transition-all after:duration-300 ${
+                location.pathname === l.to
+                  ? "text-primary after:w-full"
+                  : `${scrolled ? "text-foreground/70" : "text-foreground/60"} hover:text-primary after:w-0 hover:after:w-full`
               }`}
             >
               {l.label}
@@ -51,7 +59,7 @@ const Navbar = () => {
           ))}
           <Link
             to="/contact"
-            className="bg-primary text-primary-foreground px-5 py-2 rounded text-sm font-semibold tracking-wide uppercase transition-transform hover:scale-[1.03] active:scale-[0.97]"
+            className="bg-primary text-primary-foreground px-7 py-2.5 rounded-full text-[13px] font-semibold tracking-[0.12em] uppercase transition-all duration-200 hover:shadow-glow hover:scale-[1.02] active:scale-[0.97]"
           >
             Book Now
           </Link>
@@ -69,14 +77,14 @@ const Navbar = () => {
 
       {/* Mobile menu */}
       {open && (
-        <div className="md:hidden bg-card/95 backdrop-blur-sm border-t border-border animate-fade-in">
-          <div className="container py-4 flex flex-col gap-3">
+        <div className="md:hidden bg-card/98 backdrop-blur-md border-t border-border animate-fade-in">
+          <div className="container py-6 flex flex-col gap-1">
             {links.map((l) => (
               <Link
                 key={l.to}
                 to={l.to}
-                className={`font-body text-base py-2 transition-colors ${
-                  location.pathname === l.to ? "text-primary font-semibold" : "text-foreground"
+                className={`font-body text-base py-3 px-4 rounded-xl transition-all duration-200 ${
+                  location.pathname === l.to ? "text-primary bg-ocean-light font-semibold" : "text-foreground hover:bg-muted"
                 }`}
               >
                 {l.label}
@@ -84,7 +92,7 @@ const Navbar = () => {
             ))}
             <Link
               to="/contact"
-              className="bg-primary text-primary-foreground px-5 py-3 rounded text-center font-semibold tracking-wide uppercase mt-2"
+              className="bg-primary text-primary-foreground px-6 py-3.5 rounded-full text-center font-semibold tracking-[0.1em] uppercase mt-4"
             >
               Book Now
             </Link>
