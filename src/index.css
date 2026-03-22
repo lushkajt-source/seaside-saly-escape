@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,43 +6,45 @@
 
 @layer base {
   :root {
-    --background: 40 25% 97%;
-    --foreground: 220 25% 14%;
+    --background: 40 30% 96%;
+    --foreground: 30 10% 15%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 220 25% 14%;
+    --card: 40 35% 98%;
+    --card-foreground: 30 10% 15%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 25% 14%;
+    --popover: 40 35% 98%;
+    --popover-foreground: 30 10% 15%;
 
-    --primary: 198 50% 38%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 30 10% 15%;
+    --primary-foreground: 40 30% 96%;
 
-    --secondary: 36 35% 91%;
-    --secondary-foreground: 220 25% 14%;
+    --secondary: 36 30% 92%;
+    --secondary-foreground: 30 10% 15%;
 
-    --muted: 210 15% 95%;
-    --muted-foreground: 220 10% 46%;
+    --muted: 36 20% 93%;
+    --muted-foreground: 30 8% 50%;
 
-    --accent: 32 65% 55%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 38 55% 55%;
+    --accent-foreground: 40 30% 96%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 36 18% 88%;
+    --border: 36 20% 88%;
     --input: 36 18% 85%;
-    --ring: 198 50% 38%;
+    --ring: 38 55% 55%;
 
     --radius: 0.5rem;
 
-    --sand: 36 35% 91%;
-    --sand-dark: 36 25% 78%;
-    --ocean: 198 50% 38%;
-    --ocean-light: 198 55% 94%;
-    --ocean-dark: 198 55% 28%;
-    --warm: 32 65% 55%;
-    --cream: 40 40% 96%;
+    --sand: 36 30% 92%;
+    --sand-dark: 36 22% 78%;
+    --ocean: 198 35% 42%;
+    --ocean-light: 198 40% 94%;
+    --ocean-dark: 198 40% 30%;
+    --warm: 38 55% 55%;
+    --cream: 40 35% 96%;
+    --gold: 38 55% 55%;
+    --ivory: 40 40% 97%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -68,7 +70,7 @@
   h1, h2, h3, h4, h5, h6 {
     font-family: 'Cormorant Garamond', serif;
     overflow-wrap: break-word;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
   }
   html {
     scroll-behavior: smooth;
@@ -91,8 +93,8 @@
 @keyframes fade-up {
   from {
     opacity: 0;
-    transform: translateY(24px);
-    filter: blur(6px);
+    transform: translateY(20px);
+    filter: blur(4px);
   }
   to {
     opacity: 1;
@@ -121,6 +123,11 @@
   to { transform: scale(1); opacity: 1; }
 }
 
+@keyframes slow-zoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+
 .animate-fade-up {
   animation: fade-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
@@ -137,20 +144,24 @@
   animation: gentle-float 4s ease-in-out infinite;
 }
 
+.animate-slow-zoom {
+  animation: slow-zoom 20s ease-in-out forwards;
+}
+
 /* Premium interactive effects */
 .hover-lift {
   @apply transition-all duration-300;
 }
 .hover-lift:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px -8px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 12px 40px -8px rgba(0, 0, 0, 0.1);
 }
 
 .hover-glow {
   @apply transition-all duration-300;
 }
 .hover-glow:hover {
-  box-shadow: 0 0 0 1px hsl(var(--primary) / 0.2), 0 8px 32px -4px hsl(var(--primary) / 0.15);
+  box-shadow: 0 0 0 1px hsl(var(--gold) / 0.2), 0 8px 32px -4px hsl(var(--gold) / 0.12);
 }
 
 /* Image overlay styles */
@@ -162,7 +173,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, transparent 40%, hsl(var(--foreground) / 0.6) 100%);
+  background: linear-gradient(180deg, transparent 40%, hsl(var(--foreground) / 0.5) 100%);
   pointer-events: none;
   transition: opacity 0.4s ease;
 }
@@ -170,21 +181,28 @@
   opacity: 0.7;
 }
 .img-overlay img {
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .img-overlay:hover img {
-  transform: scale(1.05);
+  transform: scale(1.04);
 }
 
 /* Premium divider */
 .premium-divider {
   width: 48px;
-  height: 2px;
-  background: hsl(var(--warm));
+  height: 1px;
+  background: hsl(var(--gold));
   margin: 0 auto;
+}
+
+/* Gold accent line */
+.gold-line {
+  width: 40px;
+  height: 1px;
+  background: hsl(var(--gold));
 }
 
 /* Subtle grain texture for premium feel */
 .bg-grain {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.02'/%3E%3C/svg%3E");
 }
