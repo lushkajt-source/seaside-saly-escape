@@ -1,24 +1,31 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Star, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import heroImg from "@/assets/hero-hotel.jpg";
-import singleImg from "@/assets/room-single.jpg";
-import doubleImg from "@/assets/room-double.jpg";
-import suiteImg from "@/assets/room-suite.jpg";
+import { ArrowRight } from "lucide-react";
+import heroImg from "@/assets/hero-adriatic.jpg";
+import deluxeImg from "@/assets/room-deluxe.jpg";
+import seaviewImg from "@/assets/room-seaview.jpg";
+import signatureImg from "@/assets/room-signature.jpg";
+import beachImg from "@/assets/experience-beach.jpg";
+import sunsetImg from "@/assets/experience-sunset.jpg";
+import diningImg from "@/assets/dining.jpg";
+import poolImg from "@/assets/gallery-pool-adriatic.jpg";
+import spaImg from "@/assets/gallery-spa-adriatic.jpg";
+import aerialImg from "@/assets/gallery-aerial.jpg";
 import ScrollReveal from "@/components/ScrollReveal";
 import BookingForm from "@/components/BookingForm";
 
 const rooms = [
-  { name: "Single Room", price: "$65", img: singleImg, features: ["WiFi", "AC", "Garden View"] },
-  { name: "Double Room", price: "$110", img: doubleImg, features: ["WiFi", "AC", "Sea View"] },
-  { name: "Suite", price: "$195", img: suiteImg, features: ["WiFi", "AC", "Panoramic View", "Living Area"] },
+  { name: "Deluxe Room", price: "€120", img: deluxeImg, desc: "Warm elegance with a private balcony" },
+  { name: "Sea View Room", price: "€180", img: seaviewImg, desc: "Floor-to-ceiling Adriatic panoramas" },
+  { name: "Signature Suite", price: "€320", img: signatureImg, desc: "Living area, terrace & marble bath" },
 ];
 
-const testimonials = [
-  { name: "Marie Laurent", location: "Paris, France", text: "An absolutely magical stay. The sound of the waves, the warm staff — we felt truly at home. This is the kind of place you dream about long after you leave.", rating: 5 },
-  { name: "Ahmed Keita", location: "Dakar, Senegal", text: "Perfect location, spotless rooms, and the restaurant serves the freshest seafood I've ever had. A hidden gem on the Petite Côte.", rating: 5 },
-  { name: "Claire Dubois", location: "Brussels, Belgium", text: "We booked the suite for our anniversary and it exceeded every expectation. The sunset views from the balcony were absolutely breathtaking.", rating: 5 },
+const galleryImages = [
+  { src: heroImg, alt: "Hotel exterior", span: "md:col-span-2 md:row-span-2" },
+  { src: poolImg, alt: "Infinity pool", span: "" },
+  { src: spaImg, alt: "Spa", span: "" },
+  { src: beachImg, alt: "Beach", span: "md:col-span-2" },
+  { src: aerialImg, alt: "Aerial coast", span: "" },
 ];
 
 const Index = () => {
@@ -26,162 +33,239 @@ const Index = () => {
 
   return (
     <>
-      {/* Hero */}
-      <section className="relative min-h-[100vh] flex items-end">
-        <img src={heroImg} alt="Hotel Saly beachfront at golden hour" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-t from-foreground/70 via-foreground/20 to-transparent" />
-        <div className="container relative z-10 pb-20 md:pb-28 pt-40">
-          <div className="max-w-2xl">
-            <p className="font-body text-[11px] tracking-[0.4em] uppercase text-background/60 mb-4 animate-fade-up" style={{ animationDelay: "0.1s" }}>
-              Saly Portudal · Senegal
-            </p>
-            <h1
-              className="font-display text-5xl md:text-7xl text-background leading-[1.05] mb-6 text-balance animate-fade-up"
-              style={{ animationDelay: "0.2s" }}
+      {/* ── HERO ── */}
+      <section className="relative min-h-[100vh] flex items-center justify-center overflow-hidden">
+        <img
+          src={heroImg}
+          alt="Hotel Saly beachfront at golden hour on the Adriatic"
+          className="absolute inset-0 w-full h-full object-cover animate-slow-zoom"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/50" />
+        <div className="relative z-10 text-center px-6 max-w-3xl">
+          <p
+            className="font-body text-[11px] tracking-[0.5em] uppercase text-white/50 mb-6 animate-fade-up"
+            style={{ animationDelay: "0.2s" }}
+          >
+            Durrës · Albania
+          </p>
+          <h1
+            className="font-display text-5xl sm:text-6xl md:text-8xl text-white font-light leading-[0.95] mb-6 animate-fade-up"
+            style={{ animationDelay: "0.4s", lineHeight: "0.95" }}
+          >
+            Hotel Saly
+          </h1>
+          <p
+            className="font-display text-xl md:text-2xl text-white/80 italic font-light mb-12 animate-fade-up"
+            style={{ animationDelay: "0.6s" }}
+          >
+            A Private Escape on the Adriatic
+          </p>
+          <div className="animate-fade-up" style={{ animationDelay: "0.8s" }}>
+            <button
+              onClick={() => setBooking(true)}
+              className="bg-white/15 text-white border border-white/30 px-10 py-4 rounded-full text-[12px] font-medium tracking-[0.2em] uppercase transition-all duration-300 hover:bg-white/25 active:scale-[0.97]"
             >
-              Your Relaxing Escape by the Sea
-            </h1>
-            <p
-              className="text-background/75 text-lg md:text-xl mb-10 max-w-lg font-light leading-relaxed animate-fade-up"
-              style={{ animationDelay: "0.4s" }}
-            >
-              Discover serenity on the sun-kissed shores of Saly. Where comfort meets the gentle ocean breeze.
-            </p>
-            <div className="flex flex-wrap gap-4 animate-fade-up" style={{ animationDelay: "0.5s" }}>
-              <Button variant="warm" size="xl" onClick={() => setBooking(true)}>
-                Book Your Stay
-              </Button>
-              <Link to="/rooms">
-                <Button variant="outline" size="xl" className="border-background/30 text-background hover:bg-background/10 hover:border-background/50">
-                  Explore Rooms
-                  <ArrowRight size={16} />
-                </Button>
-              </Link>
-            </div>
+              Book Your Stay
+            </button>
           </div>
         </div>
+        {/* Scroll hint */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-float">
+          <div className="w-[1px] h-10 bg-white/30" />
+        </div>
       </section>
 
-      {/* Intro */}
-      <section className="py-28 md:py-36 bg-grain">
-        <div className="container text-center max-w-2xl">
+      {/* ── INTRO ── */}
+      <section className="py-32 md:py-44 bg-grain">
+        <div className="container text-center max-w-xl">
           <ScrollReveal>
-            <p className="font-body text-[11px] tracking-[0.4em] uppercase text-muted-foreground mb-4">Welcome</p>
-            <h2 className="font-display text-4xl md:text-5xl mb-5 leading-[1.1]">A Coastal Haven</h2>
-            <div className="premium-divider mb-8" />
-            <p className="text-muted-foreground leading-[1.8] text-base">
-              Tucked along the golden coastline of Senegal, Hotel Saly offers a peaceful retreat 
-              where the rhythm of the ocean sets the pace. With thoughtfully designed rooms, 
-              warm hospitality, and steps-to-the-beach convenience, every stay feels like coming home.
+            <div className="gold-line mx-auto mb-8" />
+            <h2 className="font-display text-3xl md:text-5xl font-light mb-8 leading-[1.1] italic">
+              Where the sea meets serenity
+            </h2>
+            <p className="text-muted-foreground leading-[2] text-[15px] font-light">
+              Perched on the sun-drenched shores of the Albanian Riviera, Hotel Saly
+              is a sanctuary of understated luxury — where the gentle rhythm of the
+              Adriatic sets the pace, and every detail is considered with quiet intention.
             </p>
           </ScrollReveal>
         </div>
       </section>
 
-      {/* Featured Rooms */}
-      <section className="py-28 md:py-36 bg-sand">
+      {/* ── ROOMS PREVIEW ── */}
+      <section className="py-28 md:py-36 bg-background">
         <div className="container">
           <ScrollReveal>
-            <div className="text-center mb-16">
+            <div className="text-center mb-20">
               <p className="font-body text-[11px] tracking-[0.4em] uppercase text-muted-foreground mb-4">Accommodations</p>
-              <h2 className="font-display text-4xl md:text-5xl mb-5 leading-[1.1]">Our Rooms</h2>
-              <div className="premium-divider mb-6" />
-              <p className="text-muted-foreground max-w-md mx-auto">
-                Each room is your personal seaside sanctuary — designed for restful comfort with modern amenities.
-              </p>
+              <h2 className="font-display text-4xl md:text-5xl font-light mb-6 leading-[1.1]">
+                Our Rooms
+              </h2>
+              <div className="premium-divider" />
             </div>
           </ScrollReveal>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-6">
             {rooms.map((room, i) => (
-              <ScrollReveal key={room.name} delay={i * 100}>
-                <div className="group bg-card rounded-2xl overflow-hidden shadow-premium hover-lift">
-                  <div className="img-overlay aspect-[4/3]">
+              <ScrollReveal key={room.name} delay={i * 120}>
+                <div className="group cursor-pointer">
+                  <div className="img-overlay aspect-[3/4] rounded-xl overflow-hidden mb-6">
                     <img
                       src={room.img}
                       alt={room.name}
                       className="w-full h-full object-cover"
                       loading="lazy"
                     />
-                    <div className="absolute bottom-4 left-4 z-10">
-                      <span className="bg-background/90 backdrop-blur-sm text-foreground text-xs font-semibold px-3 py-1.5 rounded-full">
+                    <div className="absolute bottom-5 left-5 z-10">
+                      <span className="bg-background/90 backdrop-blur-sm text-foreground text-[11px] font-medium px-4 py-2 rounded-full tracking-wide">
                         From {room.price}/night
                       </span>
                     </div>
                   </div>
-                  <div className="p-7">
-                    <h3 className="font-display text-2xl mb-3">{room.name}</h3>
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {room.features.map((f) => (
-                        <span key={f} className="text-xs font-medium bg-ocean-light text-ocean-dark px-3 py-1.5 rounded-full">
-                          {f}
-                        </span>
-                      ))}
-                    </div>
-                    <Link to="/rooms">
-                      <Button variant="default" className="w-full">
-                        View Details
-                        <ArrowRight size={14} />
-                      </Button>
-                    </Link>
-                  </div>
+                  <h3 className="font-display text-2xl font-light mb-2">{room.name}</h3>
+                  <p className="text-muted-foreground text-sm font-light">{room.desc}</p>
                 </div>
               </ScrollReveal>
             ))}
           </div>
+
+          <ScrollReveal>
+            <div className="text-center mt-16">
+              <Link
+                to="/rooms"
+                className="inline-flex items-center gap-3 text-[12px] font-medium tracking-[0.15em] uppercase text-foreground transition-all duration-200 group"
+              >
+                Explore Rooms
+                <ArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-1" />
+              </Link>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-28 md:py-36 bg-grain">
+      {/* ── EXPERIENCES ── */}
+      <section className="py-28 md:py-36 bg-secondary">
         <div className="container">
           <ScrollReveal>
-            <div className="text-center mb-16">
-              <p className="font-body text-[11px] tracking-[0.4em] uppercase text-muted-foreground mb-4">Testimonials</p>
-              <h2 className="font-display text-4xl md:text-5xl mb-5 leading-[1.1]">Guest Experiences</h2>
+            <div className="text-center mb-20">
+              <p className="font-body text-[11px] tracking-[0.4em] uppercase text-muted-foreground mb-4">Experiences</p>
+              <h2 className="font-display text-4xl md:text-5xl font-light mb-6 leading-[1.1]">
+                Moments to Remember
+              </h2>
               <div className="premium-divider" />
             </div>
           </ScrollReveal>
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {testimonials.map((t, i) => (
-              <ScrollReveal key={t.name} delay={i * 100}>
-                <div className="bg-card p-8 md:p-10 rounded-2xl shadow-premium hover-lift h-full flex flex-col">
-                  <div className="flex gap-1 mb-5">
-                    {Array.from({ length: t.rating }).map((_, j) => (
-                      <Star key={j} size={14} className="fill-warm text-warm" />
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground text-sm leading-[1.8] mb-6 flex-1 italic">
-                    "{t.text}"
-                  </p>
-                  <div>
-                    <p className="font-semibold text-sm">{t.name}</p>
-                    <p className="text-xs text-muted-foreground">{t.location}</p>
-                  </div>
+
+          <div className="grid md:grid-cols-2 gap-6 md:gap-8">
+            <ScrollReveal direction="left">
+              <div className="relative group">
+                <div className="img-overlay aspect-[4/3] rounded-xl overflow-hidden">
+                  <img src={beachImg} alt="Beach relaxation" className="w-full h-full object-cover" loading="lazy" />
                 </div>
-              </ScrollReveal>
-            ))}
+                <div className="absolute bottom-6 left-6 z-10">
+                  <p className="font-body text-[11px] tracking-[0.3em] uppercase text-white/60 mb-1">Beach & Shore</p>
+                  <h3 className="font-display text-2xl md:text-3xl text-white font-light">Private Beach Access</h3>
+                </div>
+              </div>
+            </ScrollReveal>
+            <ScrollReveal direction="right">
+              <div className="relative group">
+                <div className="img-overlay aspect-[4/3] rounded-xl overflow-hidden">
+                  <img src={sunsetImg} alt="Sunset terrace" className="w-full h-full object-cover" loading="lazy" />
+                </div>
+                <div className="absolute bottom-6 left-6 z-10">
+                  <p className="font-body text-[11px] tracking-[0.3em] uppercase text-white/60 mb-1">Sunset Ritual</p>
+                  <h3 className="font-display text-2xl md:text-3xl text-white font-light">Golden Hour Terrace</h3>
+                </div>
+              </div>
+            </ScrollReveal>
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="relative py-28 md:py-36 overflow-hidden">
-        <img src={heroImg} alt="" className="absolute inset-0 w-full h-full object-cover" aria-hidden="true" />
-        <div className="absolute inset-0 bg-foreground/65" />
-        <div className="container relative z-10 text-center">
+      {/* ── DINING ── */}
+      <section className="relative py-36 md:py-48 overflow-hidden">
+        <img src={diningImg} alt="Mediterranean dining" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-black/60" />
+        <div className="container relative z-10">
           <ScrollReveal>
-            <p className="font-body text-[11px] tracking-[0.4em] uppercase text-background/50 mb-4">Ready?</p>
-            <h2 className="font-display text-4xl md:text-5xl text-background mb-5 leading-[1.1] text-balance">
-              Start Planning Your Escape
+            <div className="max-w-lg">
+              <div className="w-10 h-[1px] bg-white/40 mb-8" />
+              <p className="font-body text-[11px] tracking-[0.4em] uppercase text-white/40 mb-4">Culinary</p>
+              <h2 className="font-display text-4xl md:text-6xl text-white font-light leading-[1.05] mb-6">
+                Mediterranean dining by the sea
+              </h2>
+              <p className="text-white/60 leading-[1.9] text-[15px] font-light mb-10">
+                Fresh Adriatic seafood, locally sourced produce, and Mediterranean
+                tradition — served under the stars on our seaside terrace.
+              </p>
+              <Link
+                to="/about"
+                className="inline-flex items-center gap-3 text-[12px] font-medium tracking-[0.15em] uppercase text-white/80 hover:text-white transition-all duration-200 group"
+              >
+                Discover More
+                <ArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-1" />
+              </Link>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* ── GALLERY PREVIEW ── */}
+      <section className="py-28 md:py-36 bg-background">
+        <div className="container">
+          <ScrollReveal>
+            <div className="text-center mb-16">
+              <p className="font-body text-[11px] tracking-[0.4em] uppercase text-muted-foreground mb-4">Gallery</p>
+              <h2 className="font-display text-4xl md:text-5xl font-light mb-6 leading-[1.1]">
+                A Glimpse of Paradise
+              </h2>
+              <div className="premium-divider" />
+            </div>
+          </ScrollReveal>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-[200px] md:auto-rows-[240px]">
+            {galleryImages.map((img, i) => (
+              <ScrollReveal key={img.alt} delay={i * 80} className={img.span}>
+                <div className="img-overlay w-full h-full rounded-lg overflow-hidden">
+                  <img src={img.src} alt={img.alt} className="w-full h-full object-cover" loading="lazy" />
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+
+          <ScrollReveal>
+            <div className="text-center mt-12">
+              <Link
+                to="/gallery"
+                className="inline-flex items-center gap-3 text-[12px] font-medium tracking-[0.15em] uppercase text-foreground transition-all duration-200 group"
+              >
+                View Full Gallery
+                <ArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-1" />
+              </Link>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* ── CTA ── */}
+      <section className="py-32 md:py-44 bg-secondary bg-grain">
+        <div className="container text-center max-w-xl">
+          <ScrollReveal>
+            <div className="gold-line mx-auto mb-8" />
+            <h2 className="font-display text-4xl md:text-6xl font-light mb-6 leading-[1.05] italic">
+              Reserve Your Escape
             </h2>
-            <div className="w-12 h-[2px] bg-warm mx-auto mb-8" />
-            <p className="text-background/70 max-w-md mx-auto mb-10 leading-relaxed">
-              Whether you seek adventure or tranquility, Hotel Saly is your gateway to the perfect seaside holiday.
+            <p className="text-muted-foreground leading-[1.9] text-[15px] font-light mb-12">
+              Let the Adriatic breeze welcome you home. Your private seaside
+              sanctuary awaits.
             </p>
-            <Button variant="warm" size="xl" onClick={() => setBooking(true)}>
-              Reserve Your Room
-            </Button>
+            <button
+              onClick={() => setBooking(true)}
+              className="bg-foreground text-background px-10 py-4 rounded-full text-[12px] font-medium tracking-[0.2em] uppercase transition-all duration-200 hover:bg-foreground/90 active:scale-[0.97]"
+            >
+              Book Now
+            </button>
           </ScrollReveal>
         </div>
       </section>
