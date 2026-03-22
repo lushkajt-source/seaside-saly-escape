@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Wifi, Wind, Eye, Bed, ArrowRight } from "lucide-react";
 import deluxeImg from "@/assets/room-deluxe.jpg";
 import seaviewImg from "@/assets/room-seaview.jpg";
@@ -10,6 +11,7 @@ import BookingForm from "@/components/BookingForm";
 const rooms = [
   {
     name: "Deluxe Room",
+    slug: "deluxe-room",
     tag: "Comfort",
     price: "€120",
     img: deluxeImg,
@@ -18,6 +20,7 @@ const rooms = [
   },
   {
     name: "Sea View Room",
+    slug: "sea-view-room",
     tag: "Elegance",
     price: "€180",
     img: seaviewImg,
@@ -26,6 +29,7 @@ const rooms = [
   },
   {
     name: "Signature Suite",
+    slug: "signature-suite",
     tag: "Luxury",
     price: "€320",
     img: signatureImg,
@@ -45,6 +49,7 @@ const featureIcon = (f: string) => {
 
 const Rooms = () => {
   const [booking, setBooking] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   return (
     <>
@@ -127,7 +132,7 @@ const Rooms = () => {
                         Book — {room.price}/night
                       </button>
                       <button
-                        onClick={() => setBooking(room.name)}
+                        onClick={() => navigate(`/rooms/${room.slug}`)}
                         className="hidden md:inline-flex items-center gap-2 text-[12px] font-medium tracking-[0.12em] uppercase text-foreground/60 hover:text-foreground transition-colors duration-200 group"
                       >
                         View Details
