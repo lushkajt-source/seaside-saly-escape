@@ -10,7 +10,7 @@ const Footer = () => (
           <h3 className="font-display text-3xl text-background mb-2">Hotel Saly</h3>
           <div className="w-10 h-[2px] bg-warm mb-5" />
           <p className="text-sm leading-relaxed max-w-sm">
-            Your relaxing escape by the sea. Nestled along the beautiful coast of Saly Portudal, 
+            Your relaxing escape by the sea. Nestled along the stunning Adriatic coast in Durrës Plazh, Albania, 
             offering comfort, charm, and unforgettable ocean views since 2005.
           </p>
         </div>
@@ -47,7 +47,7 @@ const Footer = () => (
             </a>
             <div className="flex items-center gap-3">
               <MapPin size={15} />
-              <span>Saly Portudal, Mbour, Senegal</span>
+              <span>Durrës Plazh, Albania · 8F6J+P5</span>
             </div>
           </div>
         </div>

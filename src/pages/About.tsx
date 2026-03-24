@@ -33,7 +33,7 @@ const About = () => (
           <div className="w-8 h-[2px] bg-warm mb-6" />
           <div className="space-y-5 text-muted-foreground leading-[1.8]">
             <p>
-              Founded on the sun-drenched coast of Saly Portudal in Senegal, Hotel Saly was born from a simple dream: 
+              Founded on the sun-kissed Adriatic coast of Durrës Plazh in Albania, Hotel Saly was born from a simple dream: 
               to create a place where travelers could truly unwind. What started as a small family guesthouse has grown 
               into a beloved retreat, all while keeping that warm, personal touch.
             </p>
@@ -87,13 +87,13 @@ const About = () => (
           <div className="w-8 h-[2px] bg-warm mb-6" />
           <div className="space-y-5 text-muted-foreground leading-[1.8]">
             <p>
-              Saly Portudal sits on Senegal's stunning Petite Côte, known for its pristine beaches, 
-              warm waters, and year-round sunshine. Just an hour's drive from Dakar, it's the country's 
+              Durrës Plazh sits on Albania's stunning Adriatic coast, known for its pristine beaches, 
+              warm waters, and year-round sunshine. Just 30 minutes from Tirana, it's the country's 
               most beloved seaside destination.
             </p>
             <p>
               Whether you're here for a weekend escape or an extended stay, Hotel Saly will feel like a second home 
-              by the time you leave. And the ocean? It'll stay with you forever.
+              by the time you leave. And the Adriatic? It'll stay with you forever.
             </p>
           </div>
         </ScrollReveal>
