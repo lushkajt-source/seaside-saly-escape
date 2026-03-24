@@ -7,9 +7,18 @@ import BookingForm from "@/components/BookingForm";
 const Contact = () => {
   const [sent, setSent] = useState(false);
   const [booking, setBooking] = useState(false);
+  const [contactForm, setContactForm] = useState({ name: "", email: "", subject: "", message: "" });
+
+  const handleContactChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setContactForm({ ...contactForm, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const msg = encodeURIComponent(
+      `📩 New Contact Message\n\n👤 Name: ${contactForm.name}\n📧 Email: ${contactForm.email}\n📌 Subject: ${contactForm.subject || "N/A"}\n💬 Message: ${contactForm.message}`
+    );
+    window.open(`https://wa.me/447777737080?text=${msg}`, "_blank");
     setSent(true);
   };
 

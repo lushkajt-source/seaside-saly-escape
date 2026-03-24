@@ -26,6 +26,11 @@ const BookingForm = ({ open, onClose, roomType }: Props) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // Send booking details to WhatsApp automatically
+    const msg = encodeURIComponent(
+      `📋 New Booking Request\n\n👤 Name: ${formData.name}\n📧 Email: ${formData.email}\n📅 Check-in: ${formData.checkin}\n📅 Check-out: ${formData.checkout}\n👥 Guests: ${formData.guests}${roomType ? `\n🏨 Room: ${roomType}` : ""}`
+    );
+    window.open(`https://wa.me/447777737080?text=${msg}`, "_blank");
     setSubmitted(true);
   };
 
