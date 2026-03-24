@@ -37,9 +37,9 @@ const Footer = () => (
         <div className="md:col-span-4">
           <h4 className="font-body text-xs uppercase tracking-[0.2em] text-background/40 mb-6">Contact</h4>
           <div className="flex flex-col gap-4 text-sm">
-            <a href="tel:+221339571234" className="flex items-center gap-3 hover:text-background transition-colors">
+            <a href="tel:+355694528003" className="flex items-center gap-3 hover:text-background transition-colors">
               <Phone size={15} />
-              <span>+221 33 957 1234</span>
+              <span>+355 69 452 8003</span>
             </a>
             <a href="mailto:info@hotelsaly.com" className="flex items-center gap-3 hover:text-background transition-colors">
               <Mail size={15} />
