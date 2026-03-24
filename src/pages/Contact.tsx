@@ -39,8 +39,8 @@ const Contact = () => {
 
             <div className="flex flex-col gap-7">
               {[
-                { icon: Phone, label: "Phone", value: "+221 33 957 1234", href: "tel:+221339571234" },
-                { icon: MessageCircle, label: "WhatsApp", value: "Chat with us anytime", href: "https://wa.me/221339571234" },
+                { icon: Phone, label: "Phone", value: "+355 69 452 8003", href: "tel:+355694528003" },
+                { icon: MessageCircle, label: "WhatsApp", value: "Chat with us anytime", href: "https://wa.me/355694528003" },
                 { icon: Mail, label: "Email", value: "info@hotelsaly.com", href: "mailto:info@hotelsaly.com" },
                 { icon: MapPin, label: "Address", value: "Durrës Plazh, Albania · 8F6J+P5", href: undefined },
               ].map((item) => {

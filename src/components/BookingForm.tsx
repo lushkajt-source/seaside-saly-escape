@@ -33,7 +33,7 @@ const BookingForm = ({ open, onClose, roomType }: Props) => {
     const msg = encodeURIComponent(
       `Hello, I'd like to book a ${roomType || "room"} at Hotel Saly.\n\nName: ${formData.name}\nCheck-in: ${formData.checkin}\nCheck-out: ${formData.checkout}\nGuests: ${formData.guests}`
     );
-    window.open(`https://wa.me/221339571234?text=${msg}`, "_blank");
+    window.open(`https://wa.me/355694528003?text=${msg}`, "_blank");
   };
 
   const handleClose = () => {
