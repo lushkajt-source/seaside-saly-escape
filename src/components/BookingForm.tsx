@@ -49,10 +49,10 @@ const BookingForm = ({ open, onClose, roomType }: Props) => {
       <div className="bg-card rounded-2xl shadow-premium-xl max-w-lg w-full relative overflow-hidden animate-scale-in">
         <button
           onClick={handleClose}
-          className="absolute top-5 right-5 text-muted-foreground hover:text-foreground transition-colors z-10"
+          className="absolute top-4 right-4 w-9 h-9 rounded-full bg-muted/80 hover:bg-destructive hover:text-destructive-foreground flex items-center justify-center transition-all duration-200 z-10"
           aria-label="Close"
         >
-          <X size={20} />
+          <X size={18} strokeWidth={2.5} />
         </button>
 
         {/* Header accent bar */}
