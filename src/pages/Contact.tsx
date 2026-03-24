@@ -104,7 +104,10 @@ const Contact = () => {
                     <label className="font-body text-xs uppercase tracking-[0.15em] text-muted-foreground mb-2 block">{field.label}</label>
                     <input
                       required={field.required}
+                      name={field.name}
                       type={field.type}
+                      value={contactForm[field.name as keyof typeof contactForm]}
+                      onChange={handleContactChange}
                       placeholder={field.placeholder}
                       className="w-full border border-input rounded-xl px-5 py-3.5 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
                     />
@@ -114,7 +117,10 @@ const Contact = () => {
                   <label className="font-body text-xs uppercase tracking-[0.15em] text-muted-foreground mb-2 block">Message</label>
                   <textarea
                     required
+                    name="message"
                     rows={5}
+                    value={contactForm.message}
+                    onChange={handleContactChange}
                     placeholder="Tell us about your plans..."
                     className="w-full border border-input rounded-xl px-5 py-3.5 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all resize-none"
                   />
