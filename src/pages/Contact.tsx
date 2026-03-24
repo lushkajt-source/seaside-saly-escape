@@ -42,7 +42,7 @@ const Contact = () => {
                 { icon: Phone, label: "Phone", value: "+221 33 957 1234", href: "tel:+221339571234" },
                 { icon: MessageCircle, label: "WhatsApp", value: "Chat with us anytime", href: "https://wa.me/221339571234" },
                 { icon: Mail, label: "Email", value: "info@hotelsaly.com", href: "mailto:info@hotelsaly.com" },
-                { icon: MapPin, label: "Address", value: "Saly Portudal, Mbour, Senegal", href: undefined },
+                { icon: MapPin, label: "Address", value: "Durrës Plazh, Albania · 8F6J+P5", href: undefined },
               ].map((item) => {
                 const Wrapper = item.href ? "a" : "div";
                 const wrapperProps = item.href
@@ -123,7 +123,7 @@ const Contact = () => {
       <section>
         <iframe
           title="Hotel Saly Location"
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15436.98!2d-17.017!3d14.45!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xec10cf67e50e8f7%3A0x4b1dbb5c3fc82120!2sSaly%20Portudal!5e0!3m2!1sen!2s!4v1"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3000!2d19.45!3d41.32!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1350310470fac5db%3A0x40092af10653720!2sDurr%C3%ABs%20Beach!5e0!3m2!1sen!2s!4v1"
           className="w-full h-[450px] border-0"
           loading="lazy"
           allowFullScreen
