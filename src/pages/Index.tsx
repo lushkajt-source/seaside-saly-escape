@@ -18,9 +18,9 @@ import BookingForm from "@/components/BookingForm";
 import RestaurantBookingForm from "@/components/RestaurantBookingForm";
 
 const rooms = [
-  { name: "Deluxe Room", price: "€120", img: deluxeImg, desc: "Warm elegance with a private balcony" },
-  { name: "Sea View Room", price: "€180", img: seaviewImg, desc: "Floor-to-ceiling Adriatic panoramas" },
-  { name: "Signature Suite", price: "€320", img: signatureImg, desc: "Living area, terrace & marble bath" },
+  { name: "Deluxe Room", price: "€120", img: deluxeImg, desc: "Warm elegance with a private balcony", slug: "deluxe-room" },
+  { name: "Sea View Room", price: "€180", img: seaviewImg, desc: "Floor-to-ceiling Adriatic panoramas", slug: "sea-view-room" },
+  { name: "Signature Suite", price: "€320", img: signatureImg, desc: "Living area, terrace & marble bath", slug: "signature-suite" },
 ];
 
 const galleryImages = [
@@ -112,7 +112,7 @@ const Index = () => {
           <div className="grid md:grid-cols-3 gap-6">
             {rooms.map((room, i) => (
               <ScrollReveal key={room.name} delay={i * 120}>
-                <div className="group cursor-pointer">
+                <Link to={`/rooms/${room.slug}`} className="group cursor-pointer block">
                   <div className="img-overlay aspect-[3/4] rounded-xl overflow-hidden mb-6">
                     <img
                       src={room.img}
@@ -128,7 +128,7 @@ const Index = () => {
                   </div>
                   <h3 className="font-display text-2xl font-light mb-2">{room.name}</h3>
                   <p className="text-muted-foreground text-sm font-light">{room.desc}</p>
-                </div>
+                </Link>
               </ScrollReveal>
             ))}
           </div>
