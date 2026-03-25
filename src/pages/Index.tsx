@@ -33,6 +33,7 @@ const galleryImages = [
 
 const Index = () => {
   const [booking, setBooking] = useState(false);
+  const [restaurantBooking, setRestaurantBooking] = useState(false);
 
   return (
     <>
@@ -186,29 +187,83 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ── DINING ── */}
+      {/* ── SALY RESTAURANT ── */}
       <section className="relative py-36 md:py-48 overflow-hidden">
-        <img src={diningImg} alt="Mediterranean dining" className="absolute inset-0 w-full h-full object-cover" />
+        <img src={restaurantImg} alt="Saly Restaurant terrace" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-black/60" />
         <div className="container relative z-10">
           <ScrollReveal>
             <div className="max-w-lg">
               <div className="w-10 h-[1px] bg-white/40 mb-8" />
-              <p className="font-body text-[11px] tracking-[0.4em] uppercase text-white/40 mb-4">Culinary</p>
-              <h2 className="font-display text-4xl md:text-6xl text-white font-light leading-[1.05] mb-6">
-                Mediterranean dining by the sea
+              <p className="font-body text-[11px] tracking-[0.4em] uppercase text-white/40 mb-4">Dining</p>
+              <h2 className="font-display text-4xl md:text-6xl text-white font-light leading-[1.05] mb-3">
+                Saly Restaurant
               </h2>
-              <p className="text-white/60 leading-[1.9] text-[15px] font-light mb-10">
+              <p className="font-display text-lg md:text-xl text-white/60 italic font-light mb-6">
+                Mediterranean dining by the sea
+              </p>
+              <p className="text-white/50 leading-[1.9] text-[15px] font-light mb-10">
                 Fresh Adriatic seafood, locally sourced produce, and Mediterranean
                 tradition — served under the stars on our seaside terrace.
               </p>
-              <Link
-                to="/about"
-                className="inline-flex items-center gap-3 text-[12px] font-medium tracking-[0.15em] uppercase text-white/80 hover:text-white transition-all duration-200 group"
+              <button
+                onClick={() => setRestaurantBooking(true)}
+                className="bg-white/15 text-white border border-white/30 px-10 py-4 rounded-full text-[12px] font-medium tracking-[0.2em] uppercase transition-all duration-300 hover:bg-white/25 active:scale-[0.97]"
               >
-                Discover More
+                Reserve a Table
+              </button>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
+      {/* ── RESTAURANT DETAILS ── */}
+      <section className="py-28 md:py-36 bg-secondary">
+        <div className="container">
+          <ScrollReveal>
+            <div className="text-center mb-20">
+              <p className="font-body text-[11px] tracking-[0.4em] uppercase text-muted-foreground mb-4">The Menu</p>
+              <h2 className="font-display text-4xl md:text-5xl font-light mb-6 leading-[1.1]">
+                A Taste of the Adriatic
+              </h2>
+              <div className="premium-divider" />
+            </div>
+          </ScrollReveal>
+
+          <div className="grid md:grid-cols-2 gap-6 md:gap-8">
+            <ScrollReveal direction="left">
+              <div className="relative group">
+                <div className="img-overlay aspect-[4/3] rounded-xl overflow-hidden">
+                  <img src={restaurantDishImg} alt="Signature dish" className="w-full h-full object-cover" loading="lazy" />
+                </div>
+                <div className="absolute bottom-6 left-6 z-10">
+                  <p className="font-body text-[11px] tracking-[0.3em] uppercase text-white/60 mb-1">Signature</p>
+                  <h3 className="font-display text-2xl md:text-3xl text-white font-light">Fresh Seafood Daily</h3>
+                </div>
+              </div>
+            </ScrollReveal>
+            <ScrollReveal direction="right">
+              <div className="relative group">
+                <div className="img-overlay aspect-[4/3] rounded-xl overflow-hidden">
+                  <img src={restaurantInteriorImg} alt="Restaurant interior" className="w-full h-full object-cover" loading="lazy" />
+                </div>
+                <div className="absolute bottom-6 left-6 z-10">
+                  <p className="font-body text-[11px] tracking-[0.3em] uppercase text-white/60 mb-1">Ambiance</p>
+                  <h3 className="font-display text-2xl md:text-3xl text-white font-light">Intimate & Elegant</h3>
+                </div>
+              </div>
+            </ScrollReveal>
+          </div>
+
+          <ScrollReveal>
+            <div className="text-center mt-16">
+              <button
+                onClick={() => setRestaurantBooking(true)}
+                className="inline-flex items-center gap-3 text-[12px] font-medium tracking-[0.15em] uppercase text-foreground transition-all duration-200 group"
+              >
+                Reserve a Table
                 <ArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-1" />
-              </Link>
+              </button>
             </div>
           </ScrollReveal>
         </div>
@@ -274,6 +329,7 @@ const Index = () => {
       </section>
 
       <BookingForm open={booking} onClose={() => setBooking(false)} />
+      <RestaurantBookingForm open={restaurantBooking} onClose={() => setRestaurantBooking(false)} />
     </>
   );
 };
