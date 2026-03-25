@@ -9,8 +9,11 @@ import roomDetail2 from "@/assets/room-detail-2.jpg";
 import roomDetail3 from "@/assets/room-detail-3.jpg";
 import roomDetail4 from "@/assets/room-detail-4.jpg";
 import deluxeImg from "@/assets/room-deluxe.jpg";
+import deluxeImg2 from "@/assets/room-deluxe-2.jpg";
 import seaviewImg from "@/assets/room-seaview.jpg";
+import seaviewImg2 from "@/assets/room-seaview-2.jpg";
 import signatureImg from "@/assets/room-signature.jpg";
+import signatureImg2 from "@/assets/room-signature-2.jpg";
 
 const roomData: Record<string, {
   name: string;
@@ -30,7 +33,7 @@ const roomData: Record<string, {
     guests: "2 Adults",
     description:
       "A warm, thoughtfully appointed retreat bathed in Adriatic light. Every detail — from the hand-selected linens to the private balcony overlooking the gardens — speaks to quiet, effortless luxury. The kind of room where mornings feel unhurried and evenings stretch into something memorable.",
-    images: [deluxeImg, roomDetail1, roomDetail2, roomDetail4],
+    images: [deluxeImg, deluxeImg2, roomDetail1, roomDetail2, roomDetail4],
     amenities: [
       { icon: Bed, label: "King Bed" },
       { icon: Eye, label: "Garden View" },
@@ -48,7 +51,7 @@ const roomData: Record<string, {
     guests: "2 Adults",
     description:
       "Wake to the shimmering Adriatic through floor-to-ceiling windows. Designed for those who want the sea as a constant companion — from sunrise coffee on your private balcony to starlight reflected on still waters. A room that feels like a gentle exhale.",
-    images: [seaviewImg, roomDetail3, roomDetail1, roomDetail2],
+    images: [seaviewImg, seaviewImg2, roomDetail3, roomDetail1, roomDetail2],
     amenities: [
       { icon: Bed, label: "King Bed" },
       { icon: Eye, label: "Sea View Balcony" },
@@ -66,7 +69,7 @@ const roomData: Record<string, {
     guests: "2 Adults + 1 Child",
     description:
       "Our finest accommodation — a generous living area flows into a private terrace with panoramic Adriatic views. Marble bath, bespoke furnishings, and the kind of space where time bends to your rhythm. This is not just a room; it is a destination within a destination.",
-    images: [signatureImg, roomDetail3, roomDetail4, roomDetail1],
+    images: [signatureImg, signatureImg2, roomDetail3, roomDetail4, roomDetail1],
     amenities: [
       { icon: Bed, label: "King Bed" },
       { icon: Eye, label: "Panoramic Terrace" },
