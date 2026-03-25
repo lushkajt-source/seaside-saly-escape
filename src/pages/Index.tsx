@@ -7,12 +7,15 @@ import seaviewImg from "@/assets/room-seaview.jpg";
 import signatureImg from "@/assets/room-signature.jpg";
 import beachImg from "@/assets/experience-beach.jpg";
 import sunsetImg from "@/assets/experience-sunset.jpg";
-import diningImg from "@/assets/dining.jpg";
+import restaurantImg from "@/assets/restaurant-saly.jpg";
+import restaurantDishImg from "@/assets/restaurant-dish.jpg";
+import restaurantInteriorImg from "@/assets/restaurant-interior.jpg";
 import poolImg from "@/assets/gallery-pool-adriatic.jpg";
 import spaImg from "@/assets/gallery-spa-adriatic.jpg";
 import aerialImg from "@/assets/gallery-aerial.jpg";
 import ScrollReveal from "@/components/ScrollReveal";
 import BookingForm from "@/components/BookingForm";
+import RestaurantBookingForm from "@/components/RestaurantBookingForm";
 
 const rooms = [
   { name: "Deluxe Room", price: "€120", img: deluxeImg, desc: "Warm elegance with a private balcony" },
