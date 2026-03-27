@@ -1,6 +1,7 @@
-import { useState } from "react";
-import { X, MessageCircle, Check } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, MessageCircle, Check, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Props {
   open: boolean;
@@ -8,35 +9,144 @@ interface Props {
   roomType?: string;
 }
 
+interface AvailableRoom {
+  id: string;
+  name: string;
+  price: number;
+  slug: string;
+}
+
 const BookingForm = ({ open, onClose, roomType }: Props) => {
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [availableRooms, setAvailableRooms] = useState<AvailableRoom[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     checkin: "",
     checkout: "",
     guests: "",
+    room_id: "",
   });
+
+  // Check availability when dates change
+  useEffect(() => {
+    if (!open || !formData.checkin || !formData.checkout) {
+      setAvailableRooms([]);
+      return;
+    }
+    if (formData.checkout <= formData.checkin) {
+      setAvailableRooms([]);
+      return;
+    }
+
+    const checkAvailability = async () => {
+      setChecking(true);
+      setError(null);
+      try {
+        // Get all rooms
+        const { data: allRooms, error: roomsErr } = await supabase
+          .from("rooms")
+          .select("id, name, price, slug");
+        if (roomsErr) throw roomsErr;
+
+        // Get conflicting bookings
+        const { data: conflicting, error: bookErr } = await supabase
+          .from("bookings")
+          .select("room_id")
+          .lt("check_in", formData.checkout)
+          .gt("check_out", formData.checkin);
+        if (bookErr) throw bookErr;
+
+        const bookedIds = new Set(conflicting?.map((b) => b.room_id) ?? []);
+        const available = (allRooms ?? []).filter((r) => !bookedIds.has(r.id));
+
+        setAvailableRooms(available);
+
+        // Auto-select if roomType matches and is available
+        if (roomType && !formData.room_id) {
+          const match = available.find((r) => r.name === roomType);
+          if (match) {
+            setFormData((prev) => ({ ...prev, room_id: match.id }));
+          }
+        }
+      } catch {
+        setError("Could not check availability. Please try again.");
+      } finally {
+        setChecking(false);
+      }
+    };
+
+    checkAvailability();
+  }, [formData.checkin, formData.checkout, open, roomType]);
 
   if (!open) return null;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setError(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Send booking details to WhatsApp automatically
-    const msg = encodeURIComponent(
-      `📋 New Booking Request\n\n👤 Name: ${formData.name}\n📧 Email: ${formData.email}\n📅 Check-in: ${formData.checkin}\n📅 Check-out: ${formData.checkout}\n👥 Guests: ${formData.guests}${roomType ? `\n🏨 Room: ${roomType}` : ""}`
-    );
-    window.open(`https://wa.me/447777737080?text=${msg}`, "_blank");
-    setSubmitted(true);
+    if (!formData.room_id) {
+      setError("Please select a room.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Re-check availability before inserting
+      const { data: conflicts } = await supabase
+        .from("bookings")
+        .select("id")
+        .eq("room_id", formData.room_id)
+        .lt("check_in", formData.checkout)
+        .gt("check_out", formData.checkin);
+
+      if (conflicts && conflicts.length > 0) {
+        setError("This room is no longer available for the selected dates. Please choose another room.");
+        // Refresh available rooms
+        setFormData((prev) => ({ ...prev, room_id: "" }));
+        setLoading(false);
+        return;
+      }
+
+      // Insert booking
+      const { error: insertErr } = await supabase.from("bookings").insert({
+        room_id: formData.room_id,
+        check_in: formData.checkin,
+        check_out: formData.checkout,
+        guest_name: formData.name,
+        guest_email: formData.email,
+        guests_count: parseInt(formData.guests) || 1,
+      });
+
+      if (insertErr) throw insertErr;
+
+      // Also send WhatsApp notification
+      const selectedRoom = availableRooms.find((r) => r.id === formData.room_id);
+      const msg = encodeURIComponent(
+        `📋 New Booking Confirmed\n\n👤 Name: ${formData.name}\n📧 Email: ${formData.email}\n📅 Check-in: ${formData.checkin}\n📅 Check-out: ${formData.checkout}\n👥 Guests: ${formData.guests}\n🏨 Room: ${selectedRoom?.name ?? roomType ?? "N/A"}`
+      );
+      window.open(`https://wa.me/447777737080?text=${msg}`, "_blank");
+
+      setSubmitted(true);
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleWhatsApp = () => {
+    const selectedRoom = availableRooms.find((r) => r.id === formData.room_id);
     const msg = encodeURIComponent(
-      `Hello, I'd like to book a ${roomType || "room"} at Hotel Saly.\n\nName: ${formData.name}\nCheck-in: ${formData.checkin}\nCheck-out: ${formData.checkout}\nGuests: ${formData.guests}`
+      `Hello, I'd like to book a ${selectedRoom?.name || roomType || "room"} at Hotel Saly.\n\nName: ${formData.name}\nCheck-in: ${formData.checkin}\nCheck-out: ${formData.checkout}\nGuests: ${formData.guests}`
     );
     window.open(`https://wa.me/447777737080?text=${msg}`, "_blank");
   };
@@ -45,13 +155,17 @@ const BookingForm = ({ open, onClose, roomType }: Props) => {
     onClose();
     setTimeout(() => {
       setSubmitted(false);
-      setFormData({ name: "", email: "", checkin: "", checkout: "", guests: "" });
+      setError(null);
+      setAvailableRooms([]);
+      setFormData({ name: "", email: "", checkin: "", checkout: "", guests: "", room_id: "" });
     }, 300);
   };
 
+  const today = new Date().toISOString().split("T")[0];
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-foreground/60 backdrop-blur-sm animate-fade-in p-4">
-      <div className="bg-card rounded-2xl shadow-premium-xl max-w-lg w-full relative overflow-hidden animate-scale-in">
+      <div className="bg-card rounded-2xl shadow-premium-xl max-w-lg w-full relative overflow-hidden animate-scale-in max-h-[90vh] overflow-y-auto">
         <button
           onClick={handleClose}
           className="absolute top-4 right-4 w-9 h-9 rounded-full bg-muted/80 hover:bg-destructive hover:text-destructive-foreground flex items-center justify-center transition-all duration-200 z-10"
@@ -60,7 +174,6 @@ const BookingForm = ({ open, onClose, roomType }: Props) => {
           <X size={18} strokeWidth={2.5} />
         </button>
 
-        {/* Header accent bar */}
         <div className="h-1 bg-gradient-to-r from-primary via-warm to-primary" />
 
         <div className="p-8 md:p-10">
@@ -72,8 +185,8 @@ const BookingForm = ({ open, onClose, roomType }: Props) => {
               <h2 className="font-display text-3xl mb-2">Booking Confirmed</h2>
               <div className="premium-divider my-4" />
               <p className="text-muted-foreground text-sm leading-relaxed max-w-sm mx-auto mb-6">
-                Thank you, {formData.name}! We've received your reservation request
-                {roomType ? ` for the ${roomType}` : ""}. We'll send a confirmation to {formData.email} shortly.
+                Thank you, {formData.name}! Your reservation has been saved.
+                We'll send a confirmation to {formData.email} shortly.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button variant="premium" onClick={handleClose}>
@@ -94,6 +207,13 @@ const BookingForm = ({ open, onClose, roomType }: Props) => {
                 )}
                 <div className="premium-divider mt-4 !mx-0" />
               </div>
+
+              {error && (
+                <div className="flex items-start gap-3 p-4 mb-5 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm">
+                  <AlertCircle size={18} className="mt-0.5 shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
 
               <form onSubmit={handleSubmit} className="flex flex-col gap-5">
                 <div>
@@ -127,6 +247,7 @@ const BookingForm = ({ open, onClose, roomType }: Props) => {
                       required
                       name="checkin"
                       type="date"
+                      min={today}
                       value={formData.checkin}
                       onChange={handleChange}
                       className="w-full border border-input rounded-xl px-5 py-3.5 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
@@ -138,12 +259,53 @@ const BookingForm = ({ open, onClose, roomType }: Props) => {
                       required
                       name="checkout"
                       type="date"
+                      min={formData.checkin || today}
                       value={formData.checkout}
                       onChange={handleChange}
                       className="w-full border border-input rounded-xl px-5 py-3.5 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
                     />
                   </div>
                 </div>
+
+                {/* Room selection based on availability */}
+                <div>
+                  <label className="font-body text-xs uppercase tracking-[0.15em] text-muted-foreground mb-2 block">
+                    Available Rooms
+                    {checking && <Loader2 size={12} className="inline ml-2 animate-spin" />}
+                  </label>
+                  {formData.checkin && formData.checkout && formData.checkout > formData.checkin ? (
+                    checking ? (
+                      <div className="flex items-center gap-2 py-3 text-sm text-muted-foreground">
+                        <Loader2 size={14} className="animate-spin" />
+                        Checking availability…
+                      </div>
+                    ) : availableRooms.length > 0 ? (
+                      <select
+                        required
+                        name="room_id"
+                        value={formData.room_id}
+                        onChange={handleChange}
+                        className="w-full border border-input rounded-xl px-5 py-3.5 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                      >
+                        <option value="">Select a room</option>
+                        {availableRooms.map((r) => (
+                          <option key={r.id} value={r.id}>
+                            {r.name} — €{r.price}/night
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <p className="text-sm text-destructive py-2">
+                        No rooms available for these dates. Please try different dates.
+                      </p>
+                    )
+                  ) : (
+                    <p className="text-sm text-muted-foreground py-2">
+                      Select check-in and check-out dates to see available rooms.
+                    </p>
+                  )}
+                </div>
+
                 <div>
                   <label className="font-body text-xs uppercase tracking-[0.15em] text-muted-foreground mb-2 block">Guests</label>
                   <select
@@ -158,13 +320,26 @@ const BookingForm = ({ open, onClose, roomType }: Props) => {
                     <option value="2">2 Guests</option>
                     <option value="3">3 Guests</option>
                     <option value="4">4 Guests</option>
-                    <option value="5+">5+ Guests</option>
+                    <option value="5">5+ Guests</option>
                   </select>
                 </div>
 
                 <div className="flex flex-col gap-3 mt-2">
-                  <Button type="submit" variant="premium" size="lg" className="w-full">
-                    Confirm Reservation
+                  <Button
+                    type="submit"
+                    variant="premium"
+                    size="lg"
+                    className="w-full"
+                    disabled={loading || !formData.room_id}
+                  >
+                    {loading ? (
+                      <span className="flex items-center gap-2">
+                        <Loader2 size={16} className="animate-spin" />
+                        Booking…
+                      </span>
+                    ) : (
+                      "Confirm Reservation"
+                    )}
                   </Button>
                   <button
                     type="button"
