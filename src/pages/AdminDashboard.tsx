@@ -1,0 +1,289 @@
+import { useEffect, useState, useMemo } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+} from "@/components/ui/table";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Loader2, LogOut, Search, CalendarDays, Users, CheckCircle, XCircle, Clock } from "lucide-react";
+import { toast } from "sonner";
+import { format } from "date-fns";
+
+interface Booking {
+  id: string;
+  guest_name: string;
+  guest_email: string | null;
+  phone: string | null;
+  check_in: string;
+  check_out: string;
+  guests_count: number | null;
+  room_type: string | null;
+  room_id: string;
+  status: string;
+  special_request: string | null;
+  created_at: string;
+}
+
+const statusColors: Record<string, { bg: string; text: string }> = {
+  pending: { bg: "hsl(38 55% 55% / 0.2)", text: "hsl(38 55% 55%)" },
+  confirmed: { bg: "hsl(142 50% 40% / 0.2)", text: "hsl(142 50% 50%)" },
+  cancelled: { bg: "hsl(0 70% 50% / 0.2)", text: "hsl(0 70% 55%)" },
+};
+
+const AdminDashboard = () => {
+  const { user, loading: authLoading, signOut } = useAuth(true);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [dateFilter, setDateFilter] = useState("");
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  const fetchBookings = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("bookings")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      toast.error("Failed to load bookings");
+    } else {
+      setBookings((data as any as Booking[]) || []);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (user) fetchBookings();
+  }, [user]);
+
+  const updateStatus = async (id: string, newStatus: string) => {
+    setUpdatingId(id);
+    const { error } = await supabase
+      .from("bookings")
+      .update({ status: newStatus } as any)
+      .eq("id", id);
+
+    if (error) {
+      toast.error("Failed to update booking");
+    } else {
+      toast.success(`Booking ${newStatus}`);
+      setBookings((prev) =>
+        prev.map((b) => (b.id === id ? { ...b, status: newStatus } : b))
+      );
+    }
+    setUpdatingId(null);
+  };
+
+  const filtered = useMemo(() => {
+    return bookings.filter((b) => {
+      const matchesSearch =
+        !searchTerm ||
+        b.guest_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (b.guest_email?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
+      const matchesStatus = statusFilter === "all" || b.status === statusFilter;
+      const matchesDate = !dateFilter || b.check_in === dateFilter;
+      return matchesSearch && matchesStatus && matchesDate;
+    });
+  }, [bookings, searchTerm, statusFilter, dateFilter]);
+
+  const stats = useMemo(() => ({
+    total: bookings.length,
+    pending: bookings.filter((b) => b.status === "pending").length,
+    confirmed: bookings.filter((b) => b.status === "confirmed").length,
+    cancelled: bookings.filter((b) => b.status === "cancelled").length,
+  }), [bookings]);
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "hsl(30 10% 12%)" }}>
+        <Loader2 className="w-8 h-8 animate-spin" style={{ color: "hsl(38 55% 55%)" }} />
+      </div>
+    );
+  }
+
+  const cardStyle = { background: "hsl(30 10% 18%)", border: "1px solid hsl(30 10% 25%)" };
+  const goldText = { color: "hsl(38 55% 55%)" };
+  const lightText = { color: "hsl(40 30% 85%)" };
+  const mutedText = { color: "hsl(30 10% 55%)" };
+
+  return (
+    <div className="min-h-screen" style={{ background: "hsl(30 10% 12%)" }}>
+      {/* Header */}
+      <div className="border-b px-6 py-4 flex items-center justify-between" style={{ borderColor: "hsl(30 10% 20%)", background: "hsl(30 10% 15%)" }}>
+        <h1 className="text-2xl font-serif" style={{ fontFamily: "'Cormorant Garamond', serif", ...goldText }}>
+          Hotel Saly — Admin Dashboard
+        </h1>
+        <Button variant="ghost" onClick={signOut} style={{ color: "hsl(30 10% 55%)" }}>
+          <LogOut className="w-4 h-4 mr-2" /> Logout
+        </Button>
+      </div>
+
+      <div className="max-w-7xl mx-auto p-6 space-y-6">
+        {/* Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { label: "Total", value: stats.total, icon: CalendarDays, color: "hsl(38 55% 55%)" },
+            { label: "Pending", value: stats.pending, icon: Clock, color: "hsl(38 55% 55%)" },
+            { label: "Confirmed", value: stats.confirmed, icon: CheckCircle, color: "hsl(142 50% 50%)" },
+            { label: "Cancelled", value: stats.cancelled, icon: XCircle, color: "hsl(0 70% 55%)" },
+          ].map((s) => (
+            <Card key={s.label} className="border-none" style={cardStyle}>
+              <CardContent className="p-5 flex items-center gap-4">
+                <s.icon className="w-8 h-8" style={{ color: s.color }} />
+                <div>
+                  <p className="text-2xl font-bold" style={lightText}>{s.value}</p>
+                  <p className="text-xs uppercase tracking-wider" style={mutedText}>{s.label}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Filters */}
+        <div className="flex flex-col md:flex-row gap-3">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4" style={mutedText} />
+            <Input
+              placeholder="Search by name or email..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 border-none"
+              style={{ background: "hsl(30 10% 18%)", color: "hsl(40 30% 85%)" }}
+            />
+          </div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-full md:w-44 border-none" style={{ background: "hsl(30 10% 18%)", color: "hsl(40 30% 85%)" }}>
+              <SelectValue placeholder="All statuses" />
+            </SelectTrigger>
+            <SelectContent style={{ background: "hsl(30 10% 18%)", color: "hsl(40 30% 85%)", border: "1px solid hsl(30 10% 25%)" }}>
+              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="confirmed">Confirmed</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
+            </SelectContent>
+          </Select>
+          <Input
+            type="date"
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+            className="w-full md:w-44 border-none"
+            style={{ background: "hsl(30 10% 18%)", color: "hsl(40 30% 85%)" }}
+          />
+        </div>
+
+        {/* Table */}
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <Loader2 className="w-8 h-8 animate-spin" style={goldText} />
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-20" style={mutedText}>
+            <Users className="w-12 h-12 mx-auto mb-3 opacity-40" />
+            <p>No bookings found</p>
+          </div>
+        ) : (
+          <div className="rounded-lg overflow-hidden" style={{ border: "1px solid hsl(30 10% 22%)" }}>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow style={{ background: "hsl(30 10% 16%)", borderColor: "hsl(30 10% 22%)" }}>
+                    {["Guest", "Email", "Phone", "Check-in", "Check-out", "Guests", "Room", "Status", "Actions"].map((h) => (
+                      <TableHead key={h} style={{ ...goldText, fontWeight: 600, letterSpacing: "0.05em", fontSize: "0.7rem", textTransform: "uppercase" }}>{h}</TableHead>
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filtered.map((b) => (
+                    <TableRow key={b.id} style={{ background: "hsl(30 10% 14%)", borderColor: "hsl(30 10% 20%)" }} className="transition-colors hover:!bg-[hsl(30,10%,17%)]">
+                      <TableCell style={lightText} className="font-medium">{b.guest_name}</TableCell>
+                      <TableCell style={mutedText} className="text-xs">{b.guest_email || "—"}</TableCell>
+                      <TableCell style={mutedText} className="text-xs">{b.phone || "—"}</TableCell>
+                      <TableCell style={lightText} className="text-xs">{format(new Date(b.check_in), "MMM d, yyyy")}</TableCell>
+                      <TableCell style={lightText} className="text-xs">{format(new Date(b.check_out), "MMM d, yyyy")}</TableCell>
+                      <TableCell style={lightText} className="text-center">{b.guests_count || 1}</TableCell>
+                      <TableCell style={mutedText} className="text-xs">{b.room_type || "—"}</TableCell>
+                      <TableCell>
+                        <span
+                          className="px-2.5 py-1 rounded-full text-xs font-semibold capitalize"
+                          style={{
+                            background: statusColors[b.status]?.bg || statusColors.pending.bg,
+                            color: statusColors[b.status]?.text || statusColors.pending.text,
+                          }}
+                        >
+                          {b.status}
+                        </span>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          {b.status !== "confirmed" && (
+                            <Button
+                              size="sm"
+                              disabled={updatingId === b.id}
+                              onClick={() => updateStatus(b.id, "confirmed")}
+                              className="text-xs border-none text-white"
+                              style={{ background: "hsl(142 50% 35%)" }}
+                            >
+                              {updatingId === b.id ? <Loader2 className="w-3 h-3 animate-spin" /> : "Confirm"}
+                            </Button>
+                          )}
+                          {b.status !== "cancelled" && (
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  disabled={updatingId === b.id}
+                                  className="text-xs"
+                                  style={{ color: "hsl(0 70% 55%)", background: "hsl(0 70% 50% / 0.1)" }}
+                                >
+                                  Cancel
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent style={{ background: "hsl(30 10% 18%)", border: "1px solid hsl(30 10% 25%)", color: "hsl(40 30% 85%)" }}>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle style={goldText}>Cancel Booking?</AlertDialogTitle>
+                                  <AlertDialogDescription style={mutedText}>
+                                    Cancel {b.guest_name}'s reservation for {format(new Date(b.check_in), "MMM d")} — {format(new Date(b.check_out), "MMM d, yyyy")}?
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel style={{ background: "hsl(30 10% 22%)", color: "hsl(40 30% 85%)", border: "none" }}>
+                                    Keep Booking
+                                  </AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => updateStatus(b.id, "cancelled")}
+                                    style={{ background: "hsl(0 70% 45%)", color: "white", border: "none" }}
+                                  >
+                                    Cancel Booking
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default AdminDashboard;
