@@ -18,12 +18,9 @@ import AdminDashboard from "./pages/AdminDashboard";
 
 const queryClient = new QueryClient();
 
-const isAdminRoute = (path: string) =>
-  path.startsWith("/admin-login") || path.startsWith("/admin-dashboard");
-
 const AppLayout = () => {
-  const location = window.location.pathname;
-  const hideChrome = isAdminRoute(location);
+  const location = useLocation();
+  const hideChrome = location.pathname.startsWith("/admin");
 
   return (
     <>
