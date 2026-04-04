@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Wifi, Wind, Eye, Bed, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import deluxeImg from "@/assets/room-deluxe.jpg";
