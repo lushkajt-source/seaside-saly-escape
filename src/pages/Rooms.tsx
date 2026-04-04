@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Wifi, Wind, Eye, Bed, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import deluxeImg from "@/assets/room-deluxe.jpg";
@@ -54,36 +54,85 @@ const featureIcon = (f: string) => {
 
 const RoomCarousel = ({ images, name }: { images: string[]; name: string }) => {
   const [current, setCurrent] = useState(0);
+  const [direction, setDirection] = useState<"left" | "right">("right");
+  const [isAnimating, setIsAnimating] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef(0);
+
+  const goTo = useCallback((next: number, dir: "left" | "right") => {
+    if (isAnimating) return;
+    setDirection(dir);
+    setIsAnimating(true);
+    setTimeout(() => {
+      setCurrent(next);
+      setIsAnimating(false);
+    }, 400);
+  }, [isAnimating]);
+
+  const prev = () => goTo((current - 1 + images.length) % images.length, "left");
+  const next = () => goTo((current + 1) % images.length, "right");
+
+  const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 50) diff > 0 ? next() : prev();
+  };
+
   return (
-    <div className="relative group">
-      <img
-        src={images[current]}
-        alt={`${name} — photo ${current + 1}`}
-        className="w-full aspect-[4/3] object-cover transition-opacity duration-500"
-        loading="lazy"
-      />
+    <div
+      ref={containerRef}
+      className="relative group overflow-hidden"
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      <div className="relative aspect-[4/3]">
+        {images.map((img, idx) => (
+          <img
+            key={idx}
+            src={img}
+            alt={`${name} — photo ${idx + 1}`}
+            className="absolute inset-0 w-full h-full object-cover transition-all duration-[400ms] ease-out"
+            style={{
+              transform: idx === current
+                ? (isAnimating
+                  ? `translateX(${direction === "right" ? "-100%" : "100%"})`
+                  : "translateX(0)")
+                : (isAnimating && idx === (direction === "right"
+                  ? (current + 1) % images.length
+                  : (current - 1 + images.length) % images.length)
+                  ? "translateX(0)"
+                  : `translateX(${idx > current ? "100%" : "-100%"})`),
+              opacity: idx === current || (isAnimating && idx === (direction === "right"
+                ? (current + 1) % images.length
+                : (current - 1 + images.length) % images.length)) ? 1 : 0,
+              zIndex: idx === current ? 2 : 1,
+            }}
+            loading="lazy"
+          />
+        ))}
+      </div>
       {images.length > 1 && (
         <>
           <button
-            onClick={(e) => { e.stopPropagation(); setCurrent((current - 1 + images.length) % images.length); }}
-            className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/70 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-background"
+            onClick={(e) => { e.stopPropagation(); prev(); }}
+            className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/70 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-background z-10"
             aria-label="Previous image"
           >
             <ChevronLeft size={16} />
           </button>
           <button
-            onClick={(e) => { e.stopPropagation(); setCurrent((current + 1) % images.length); }}
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/70 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-background"
+            onClick={(e) => { e.stopPropagation(); next(); }}
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/70 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-background z-10"
             aria-label="Next image"
           >
             <ChevronRight size={16} />
           </button>
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-10">
             {images.map((_, idx) => (
               <button
                 key={idx}
-                onClick={(e) => { e.stopPropagation(); setCurrent(idx); }}
-                className={`h-[3px] rounded-full transition-all duration-300 ${idx === current ? "w-5 bg-white" : "w-2 bg-white/40"}`}
+                onClick={(e) => { e.stopPropagation(); goTo(idx, idx > current ? "right" : "left"); }}
+                className={`h-[3px] rounded-full transition-all duration-300 ${idx === current && !isAnimating ? "w-5 bg-white" : "w-2 bg-white/40"}`}
               />
             ))}
           </div>

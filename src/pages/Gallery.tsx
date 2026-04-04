@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 
@@ -28,23 +28,30 @@ const images = [
 
 const Gallery = () => {
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const [slideDir, setSlideDir] = useState<"left" | "right">("right");
+  const [animating, setAnimating] = useState(false);
+  const touchStartX = useRef(0);
 
   const navigate = (dir: -1 | 1) => {
-    if (lightbox === null) return;
-    setLightbox((lightbox + dir + images.length) % images.length);
+    if (lightbox === null || animating) return;
+    setSlideDir(dir === 1 ? "right" : "left");
+    setAnimating(true);
+    setTimeout(() => {
+      setLightbox((lightbox + dir + images.length) % images.length);
+      setAnimating(false);
+    }, 350);
   };
 
-  // Keyboard navigation & swipe
   useEffect(() => {
     if (lightbox === null) return;
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight") setLightbox((prev) => ((prev ?? 0) + 1) % images.length);
-      if (e.key === "ArrowLeft") setLightbox((prev) => ((prev ?? 0) - 1 + images.length) % images.length);
+      if (e.key === "ArrowRight") navigate(1);
+      if (e.key === "ArrowLeft") navigate(-1);
       if (e.key === "Escape") setLightbox(null);
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [lightbox]);
+  }, [lightbox, animating]);
 
   return (
     <>
@@ -93,6 +100,11 @@ const Gallery = () => {
         <div
           className="fixed inset-0 z-[100] bg-foreground/95 flex items-center justify-center animate-fade-in"
           onClick={() => setLightbox(null)}
+          onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+          onTouchEnd={(e) => {
+            const diff = touchStartX.current - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) navigate(diff > 0 ? 1 : -1);
+          }}
         >
           <button className="absolute top-6 right-6 text-background/60 hover:text-background transition-colors z-10" aria-label="Close">
             <X size={24} />
@@ -111,7 +123,16 @@ const Gallery = () => {
           >
             <ChevronRight size={32} />
           </button>
-          <div className="text-center" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="text-center transition-all duration-[350ms] ease-out"
+            style={{
+              transform: animating
+                ? `translateX(${slideDir === "right" ? "-60px" : "60px"})`
+                : "translateX(0)",
+              opacity: animating ? 0 : 1,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <img
               src={images[lightbox].src}
               alt={images[lightbox].alt}
