@@ -100,6 +100,11 @@ const Gallery = () => {
         <div
           className="fixed inset-0 z-[100] bg-foreground/95 flex items-center justify-center animate-fade-in"
           onClick={() => setLightbox(null)}
+          onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+          onTouchEnd={(e) => {
+            const diff = touchStartX.current - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 50) navigate(diff > 0 ? 1 : -1);
+          }}
         >
           <button className="absolute top-6 right-6 text-background/60 hover:text-background transition-colors z-10" aria-label="Close">
             <X size={24} />
@@ -118,7 +123,16 @@ const Gallery = () => {
           >
             <ChevronRight size={32} />
           </button>
-          <div className="text-center" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="text-center transition-all duration-[350ms] ease-out"
+            style={{
+              transform: animating
+                ? `translateX(${slideDir === "right" ? "-60px" : "60px"})`
+                : "translateX(0)",
+              opacity: animating ? 0 : 1,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
             <img
               src={images[lightbox].src}
               alt={images[lightbox].alt}
