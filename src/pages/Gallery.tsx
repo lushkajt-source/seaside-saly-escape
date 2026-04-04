@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 
@@ -33,6 +33,18 @@ const Gallery = () => {
     if (lightbox === null) return;
     setLightbox((lightbox + dir + images.length) % images.length);
   };
+
+  // Keyboard navigation & swipe
+  useEffect(() => {
+    if (lightbox === null) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") setLightbox((prev) => ((prev ?? 0) + 1) % images.length);
+      if (e.key === "ArrowLeft") setLightbox((prev) => ((prev ?? 0) - 1 + images.length) % images.length);
+      if (e.key === "Escape") setLightbox(null);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [lightbox]);
 
   return (
     <>

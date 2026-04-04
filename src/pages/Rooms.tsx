@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Wifi, Wind, Eye, Bed, ArrowRight } from "lucide-react";
+import { Wifi, Wind, Eye, Bed, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import deluxeImg from "@/assets/room-deluxe.jpg";
+import deluxeImg2 from "@/assets/room-deluxe-2.jpg";
 import seaviewImg from "@/assets/room-seaview.jpg";
+import seaviewImg2 from "@/assets/room-seaview-2.jpg";
 import signatureImg from "@/assets/room-signature.jpg";
+import signatureImg2 from "@/assets/room-signature-2.jpg";
+import roomDetail1 from "@/assets/room-detail-1.jpg";
+import roomDetail2 from "@/assets/room-detail-2.jpg";
 import heroImg from "@/assets/hero-adriatic.jpg";
 import ScrollReveal from "@/components/ScrollReveal";
 import BookingForm from "@/components/BookingForm";
@@ -14,7 +19,7 @@ const rooms = [
     slug: "deluxe-room",
     tag: "Comfort",
     price: "€120",
-    img: deluxeImg,
+    images: [deluxeImg, deluxeImg2, roomDetail1],
     desc: "A warm, thoughtfully appointed retreat with a private balcony overlooking the hotel gardens. Soft linens, natural light, and quiet luxury in every detail.",
     features: ["King Bed", "Balcony", "Air Conditioning", "Free WiFi"],
   },
@@ -23,7 +28,7 @@ const rooms = [
     slug: "sea-view-room",
     tag: "Elegance",
     price: "€180",
-    img: seaviewImg,
+    images: [seaviewImg, seaviewImg2, roomDetail2],
     desc: "Wake to the shimmering Adriatic through floor-to-ceiling windows. Designed for those who want the sea as a constant companion — from sunrise to starlight.",
     features: ["King Bed", "Sea-View Balcony", "Air Conditioning", "Free WiFi"],
   },
@@ -32,7 +37,7 @@ const rooms = [
     slug: "signature-suite",
     tag: "Luxury",
     price: "€320",
-    img: signatureImg,
+    images: [signatureImg, signatureImg2, roomDetail1],
     desc: "Our finest accommodation — a generous living area, private terrace with panoramic views, marble bath, and bespoke furnishings that define understated grandeur.",
     features: ["King Bed", "Private Terrace", "Air Conditioning", "Free WiFi", "Marble Bath", "Living Area"],
   },
@@ -45,6 +50,47 @@ const featureIcon = (f: string) => {
   if (f.includes("WiFi")) return Wifi;
   if (f.includes("Bath")) return Bed;
   return Wifi;
+};
+
+const RoomCarousel = ({ images, name }: { images: string[]; name: string }) => {
+  const [current, setCurrent] = useState(0);
+  return (
+    <div className="relative group">
+      <img
+        src={images[current]}
+        alt={`${name} — photo ${current + 1}`}
+        className="w-full aspect-[4/3] object-cover transition-opacity duration-500"
+        loading="lazy"
+      />
+      {images.length > 1 && (
+        <>
+          <button
+            onClick={(e) => { e.stopPropagation(); setCurrent((current - 1 + images.length) % images.length); }}
+            className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/70 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-background"
+            aria-label="Previous image"
+          >
+            <ChevronLeft size={16} />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); setCurrent((current + 1) % images.length); }}
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/70 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-background"
+            aria-label="Next image"
+          >
+            <ChevronRight size={16} />
+          </button>
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+            {images.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={(e) => { e.stopPropagation(); setCurrent(idx); }}
+                className={`h-[3px] rounded-full transition-all duration-300 ${idx === current ? "w-5 bg-white" : "w-2 bg-white/40"}`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
 };
 
 const Rooms = () => {
@@ -86,14 +132,9 @@ const Rooms = () => {
             return (
               <ScrollReveal key={room.name}>
                 <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
-                  {/* Image */}
-                  <div className={`img-overlay rounded-xl overflow-hidden ${reversed ? "md:order-2" : ""}`}>
-                    <img
-                      src={room.img}
-                      alt={room.name}
-                      className="w-full aspect-[4/3] object-cover"
-                      loading="lazy"
-                    />
+                  {/* Image Carousel */}
+                  <div className={`rounded-xl overflow-hidden ${reversed ? "md:order-2" : ""}`}>
+                    <RoomCarousel images={room.images} name={room.name} />
                   </div>
 
                   {/* Content */}
