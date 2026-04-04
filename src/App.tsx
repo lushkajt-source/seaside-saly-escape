@@ -23,6 +23,10 @@ const AppLayout = () => {
   const location = useLocation();
   const hideChrome = location.pathname.startsWith("/admin");
 
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   return (
     <>
       {!hideChrome && <Navbar />}
