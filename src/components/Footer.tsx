@@ -45,10 +45,15 @@ const Footer = () => (
               <Mail size={15} />
               <span>info@hotelsaly.com</span>
             </a>
-            <div className="flex items-center gap-3">
+            <a
+              href="https://www.google.com/maps/dir//hotel+saly+durres/data=!4m6!4m5!1m1!4e2!1m2!1m1!1s0x134fd92b4911a017:0x178c04e896ffacf7?sa=X&ved=1t:155782&ictx=111"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 hover:text-background transition-colors"
+            >
               <MapPin size={15} />
-              <span>Durrës Plazh, Albania · 8F6J+P5</span>
-            </div>
+              <span>Durrës Plazh, Albania</span>
+            </a>
           </div>
         </div>
       </div>
