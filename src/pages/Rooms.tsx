@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Wifi, Wind, Eye, Bed, ArrowRight } from "lucide-react";
+import { Wifi, Wind, Eye, Bed, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import deluxeImg from "@/assets/room-deluxe.jpg";
+import deluxeImg2 from "@/assets/room-deluxe-2.jpg";
 import seaviewImg from "@/assets/room-seaview.jpg";
+import seaviewImg2 from "@/assets/room-seaview-2.jpg";
 import signatureImg from "@/assets/room-signature.jpg";
+import signatureImg2 from "@/assets/room-signature-2.jpg";
+import roomDetail1 from "@/assets/room-detail-1.jpg";
+import roomDetail2 from "@/assets/room-detail-2.jpg";
 import heroImg from "@/assets/hero-adriatic.jpg";
 import ScrollReveal from "@/components/ScrollReveal";
 import BookingForm from "@/components/BookingForm";
