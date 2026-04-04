@@ -132,14 +132,9 @@ const Rooms = () => {
             return (
               <ScrollReveal key={room.name}>
                 <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
-                  {/* Image */}
-                  <div className={`img-overlay rounded-xl overflow-hidden ${reversed ? "md:order-2" : ""}`}>
-                    <img
-                      src={room.img}
-                      alt={room.name}
-                      className="w-full aspect-[4/3] object-cover"
-                      loading="lazy"
-                    />
+                  {/* Image Carousel */}
+                  <div className={`rounded-xl overflow-hidden ${reversed ? "md:order-2" : ""}`}>
+                    <RoomCarousel images={room.images} name={room.name} />
                   </div>
 
                   {/* Content */}
