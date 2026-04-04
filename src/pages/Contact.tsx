@@ -135,13 +135,21 @@ const Contact = () => {
       </section>
 
       {/* Map */}
-      <section>
+      <section className="relative">
+        <div className="container py-16 md:py-20">
+          <ScrollReveal>
+            <p className="font-body text-[11px] tracking-[0.4em] uppercase text-muted-foreground mb-3 text-center">Find Us</p>
+            <h2 className="font-display text-3xl md:text-4xl mb-3 leading-[1.1] text-center">Our Location</h2>
+            <div className="premium-divider mb-10" />
+          </ScrollReveal>
+        </div>
         <iframe
           title="Hotel Saly Location"
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3000!2d19.45!3d41.32!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1350310470fac5db%3A0x40092af10653720!2sDurr%C3%ABs%20Beach!5e0!3m2!1sen!2s!4v1"
-          className="w-full h-[450px] border-0"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2996.5!2d19.4913!3d41.3087!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x134fd92b4911a017%3A0x178c04e896ffacf7!2sHotel%20Saly!5e0!3m2!1sen!2s!4v1"
+          className="w-full h-[450px] md:h-[500px] border-0"
           loading="lazy"
           allowFullScreen
+          referrerPolicy="no-referrer-when-downgrade"
         />
       </section>
 
