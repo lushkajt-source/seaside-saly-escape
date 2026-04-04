@@ -28,23 +28,30 @@ const images = [
 
 const Gallery = () => {
   const [lightbox, setLightbox] = useState<number | null>(null);
+  const [slideDir, setSlideDir] = useState<"left" | "right">("right");
+  const [animating, setAnimating] = useState(false);
+  const touchStartX = useRef(0);
 
   const navigate = (dir: -1 | 1) => {
-    if (lightbox === null) return;
-    setLightbox((lightbox + dir + images.length) % images.length);
+    if (lightbox === null || animating) return;
+    setSlideDir(dir === 1 ? "right" : "left");
+    setAnimating(true);
+    setTimeout(() => {
+      setLightbox((lightbox + dir + images.length) % images.length);
+      setAnimating(false);
+    }, 350);
   };
 
-  // Keyboard navigation & swipe
   useEffect(() => {
     if (lightbox === null) return;
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight") setLightbox((prev) => ((prev ?? 0) + 1) % images.length);
-      if (e.key === "ArrowLeft") setLightbox((prev) => ((prev ?? 0) - 1 + images.length) % images.length);
+      if (e.key === "ArrowRight") navigate(1);
+      if (e.key === "ArrowLeft") navigate(-1);
       if (e.key === "Escape") setLightbox(null);
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [lightbox]);
+  }, [lightbox, animating]);
 
   return (
     <>
