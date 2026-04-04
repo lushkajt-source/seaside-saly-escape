@@ -52,6 +52,47 @@ const featureIcon = (f: string) => {
   return Wifi;
 };
 
+const RoomCarousel = ({ images, name }: { images: string[]; name: string }) => {
+  const [current, setCurrent] = useState(0);
+  return (
+    <div className="relative group">
+      <img
+        src={images[current]}
+        alt={`${name} — photo ${current + 1}`}
+        className="w-full aspect-[4/3] object-cover transition-opacity duration-500"
+        loading="lazy"
+      />
+      {images.length > 1 && (
+        <>
+          <button
+            onClick={(e) => { e.stopPropagation(); setCurrent((current - 1 + images.length) % images.length); }}
+            className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/70 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-background"
+            aria-label="Previous image"
+          >
+            <ChevronLeft size={16} />
+          </button>
+          <button
+            onClick={(e) => { e.stopPropagation(); setCurrent((current + 1) % images.length); }}
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background/70 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-background"
+            aria-label="Next image"
+          >
+            <ChevronRight size={16} />
+          </button>
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
+            {images.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={(e) => { e.stopPropagation(); setCurrent(idx); }}
+                className={`h-[3px] rounded-full transition-all duration-300 ${idx === current ? "w-5 bg-white" : "w-2 bg-white/40"}`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
 const Rooms = () => {
   const [booking, setBooking] = useState<string | null>(null);
   const navigate = useNavigate();
