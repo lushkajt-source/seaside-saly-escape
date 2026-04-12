@@ -41,9 +41,9 @@ const Footer = () => (
               <Phone size={15} />
               <span>+355 69 452 8003</span>
             </a>
-            <a href="mailto:info@hotelsaly.com" className="flex items-center gap-3 hover:text-background transition-colors">
+            <a href="mailto:lushkajt@gmail.com" className="flex items-center gap-3 hover:text-background transition-colors">
               <Mail size={15} />
-              <span>info@hotelsaly.com</span>
+              <span>lushkajt@gmail.com</span>
             </a>
             <a
               href="https://www.google.com/maps/dir//hotel+saly+durres/data=!4m6!4m5!1m1!4e2!1m2!1m1!1s0x134fd92b4911a017:0x178c04e896ffacf7?sa=X&ved=1t:155782&ictx=111"

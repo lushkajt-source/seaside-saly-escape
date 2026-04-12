@@ -50,7 +50,7 @@ const Contact = () => {
               {[
                 { icon: Phone, label: "Phone", value: "+355 69 452 8003", href: "tel:+355694528003" },
                 { icon: MessageCircle, label: "WhatsApp", value: "+44 7777 737080", href: "https://wa.me/447777737080" },
-                { icon: Mail, label: "Email", value: "info@hotelsaly.com", href: "mailto:info@hotelsaly.com" },
+                { icon: Mail, label: "Email", value: "lushkajt@gmail.com", href: "mailto:lushkajt@gmail.com" },
                 { icon: MapPin, label: "Address", value: "Durrës Plazh, Albania · 8F6J+P5", href: undefined },
               ].map((item) => {
                 const Wrapper = item.href ? "a" : "div";
