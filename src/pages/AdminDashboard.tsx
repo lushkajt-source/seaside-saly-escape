@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -11,10 +12,8 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
 import { Loader2, LogOut, Search, CalendarDays, Users, CheckCircle, XCircle, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -31,12 +30,14 @@ interface Booking {
   room_id: string;
   status: string;
   special_request: string | null;
+  decline_reason: string | null;
   created_at: string;
 }
 
 const statusColors: Record<string, { bg: string; text: string }> = {
   pending: { bg: "hsl(38 55% 55% / 0.2)", text: "hsl(38 55% 55%)" },
   confirmed: { bg: "hsl(142 50% 40% / 0.2)", text: "hsl(142 50% 50%)" },
+  declined: { bg: "hsl(0 70% 50% / 0.2)", text: "hsl(0 70% 55%)" },
   cancelled: { bg: "hsl(0 70% 50% / 0.2)", text: "hsl(0 70% 55%)" },
 };
 
@@ -48,6 +49,9 @@ const AdminDashboard = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [dateFilter, setDateFilter] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [declineDialogOpen, setDeclineDialogOpen] = useState(false);
+  const [declineBooking, setDeclineBooking] = useState<Booking | null>(null);
+  const [declineReason, setDeclineReason] = useState("");
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -68,22 +72,51 @@ const AdminDashboard = () => {
     if (user) fetchBookings();
   }, [user]);
 
-  const updateStatus = async (id: string, newStatus: string) => {
+  const sendEmail = async (type: string, booking: Booking) => {
+    try {
+      await supabase.functions.invoke("send-booking-email", {
+        body: { type, booking },
+      });
+    } catch (err) {
+      console.error("Email send failed:", err);
+    }
+  };
+
+  const updateStatus = async (id: string, newStatus: string, reason?: string) => {
     setUpdatingId(id);
+    const updateData: any = { status: newStatus };
+    if (reason) updateData.decline_reason = reason;
+
     const { error } = await supabase
       .from("bookings")
-      .update({ status: newStatus } as any)
+      .update(updateData)
       .eq("id", id);
 
     if (error) {
       toast.error("Failed to update booking");
     } else {
       toast.success(`Booking ${newStatus}`);
+      const updatedBooking = bookings.find((b) => b.id === id);
+      if (updatedBooking) {
+        const bookingWithUpdate = { ...updatedBooking, status: newStatus, decline_reason: reason || null };
+        sendEmail(newStatus === "confirmed" ? "confirmed" : "declined", bookingWithUpdate);
+      }
       setBookings((prev) =>
-        prev.map((b) => (b.id === id ? { ...b, status: newStatus } : b))
+        prev.map((b) => (b.id === id ? { ...b, status: newStatus, decline_reason: reason || b.decline_reason } : b))
       );
     }
     setUpdatingId(null);
+  };
+
+  const handleDecline = () => {
+    if (!declineBooking || !declineReason.trim()) {
+      toast.error("Please enter a reason for declining");
+      return;
+    }
+    updateStatus(declineBooking.id, "declined", declineReason.trim());
+    setDeclineDialogOpen(false);
+    setDeclineBooking(null);
+    setDeclineReason("");
   };
 
   const filtered = useMemo(() => {
@@ -102,7 +135,7 @@ const AdminDashboard = () => {
     total: bookings.length,
     pending: bookings.filter((b) => b.status === "pending").length,
     confirmed: bookings.filter((b) => b.status === "confirmed").length,
-    cancelled: bookings.filter((b) => b.status === "cancelled").length,
+    declined: bookings.filter((b) => b.status === "declined" || b.status === "cancelled").length,
   }), [bookings]);
 
   if (authLoading) {
@@ -137,7 +170,7 @@ const AdminDashboard = () => {
             { label: "Total", value: stats.total, icon: CalendarDays, color: "hsl(38 55% 55%)" },
             { label: "Pending", value: stats.pending, icon: Clock, color: "hsl(38 55% 55%)" },
             { label: "Confirmed", value: stats.confirmed, icon: CheckCircle, color: "hsl(142 50% 50%)" },
-            { label: "Cancelled", value: stats.cancelled, icon: XCircle, color: "hsl(0 70% 55%)" },
+            { label: "Declined", value: stats.declined, icon: XCircle, color: "hsl(0 70% 55%)" },
           ].map((s) => (
             <Card key={s.label} className="border-none" style={cardStyle}>
               <CardContent className="p-5 flex items-center gap-4">
@@ -171,7 +204,7 @@ const AdminDashboard = () => {
               <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="confirmed">Confirmed</SelectItem>
-              <SelectItem value="cancelled">Cancelled</SelectItem>
+              <SelectItem value="declined">Declined</SelectItem>
             </SelectContent>
           </Select>
           <Input
@@ -207,7 +240,14 @@ const AdminDashboard = () => {
                 <TableBody>
                   {filtered.map((b) => (
                     <TableRow key={b.id} style={{ background: "hsl(30 10% 14%)", borderColor: "hsl(30 10% 20%)" }} className="transition-colors hover:!bg-[hsl(30,10%,17%)]">
-                      <TableCell style={lightText} className="font-medium">{b.guest_name}</TableCell>
+                      <TableCell style={lightText} className="font-medium">
+                        {b.guest_name}
+                        {b.special_request && (
+                          <p className="text-[10px] mt-0.5 truncate max-w-[120px]" style={mutedText} title={b.special_request}>
+                            💬 {b.special_request}
+                          </p>
+                        )}
+                      </TableCell>
                       <TableCell style={mutedText} className="text-xs">{b.guest_email || "—"}</TableCell>
                       <TableCell style={mutedText} className="text-xs">{b.phone || "—"}</TableCell>
                       <TableCell style={lightText} className="text-xs">{format(new Date(b.check_in), "MMM d, yyyy")}</TableCell>
@@ -224,53 +264,43 @@ const AdminDashboard = () => {
                         >
                           {b.status}
                         </span>
+                        {b.status === "declined" && b.decline_reason && (
+                          <p className="text-[10px] mt-1 truncate max-w-[100px]" style={{ color: "hsl(0 70% 55%)" }} title={b.decline_reason}>
+                            {b.decline_reason}
+                          </p>
+                        )}
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          {b.status !== "confirmed" && (
-                            <Button
-                              size="sm"
-                              disabled={updatingId === b.id}
-                              onClick={() => updateStatus(b.id, "confirmed")}
-                              className="text-xs border-none text-white"
-                              style={{ background: "hsl(142 50% 35%)" }}
-                            >
-                              {updatingId === b.id ? <Loader2 className="w-3 h-3 animate-spin" /> : "Confirm"}
-                            </Button>
+                          {b.status === "pending" && (
+                            <>
+                              <Button
+                                size="sm"
+                                disabled={updatingId === b.id}
+                                onClick={() => updateStatus(b.id, "confirmed")}
+                                className="text-xs border-none text-white"
+                                style={{ background: "hsl(142 50% 35%)" }}
+                              >
+                                {updatingId === b.id ? <Loader2 className="w-3 h-3 animate-spin" /> : "Confirm"}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                disabled={updatingId === b.id}
+                                onClick={() => {
+                                  setDeclineBooking(b);
+                                  setDeclineReason("");
+                                  setDeclineDialogOpen(true);
+                                }}
+                                className="text-xs"
+                                style={{ color: "hsl(0 70% 55%)", background: "hsl(0 70% 50% / 0.1)" }}
+                              >
+                                Decline
+                              </Button>
+                            </>
                           )}
-                          {b.status !== "cancelled" && (
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  disabled={updatingId === b.id}
-                                  className="text-xs"
-                                  style={{ color: "hsl(0 70% 55%)", background: "hsl(0 70% 50% / 0.1)" }}
-                                >
-                                  Cancel
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent style={{ background: "hsl(30 10% 18%)", border: "1px solid hsl(30 10% 25%)", color: "hsl(40 30% 85%)" }}>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle style={goldText}>Cancel Booking?</AlertDialogTitle>
-                                  <AlertDialogDescription style={mutedText}>
-                                    Cancel {b.guest_name}'s reservation for {format(new Date(b.check_in), "MMM d")} — {format(new Date(b.check_out), "MMM d, yyyy")}?
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel style={{ background: "hsl(30 10% 22%)", color: "hsl(40 30% 85%)", border: "none" }}>
-                                    Keep Booking
-                                  </AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={() => updateStatus(b.id, "cancelled")}
-                                    style={{ background: "hsl(0 70% 45%)", color: "white", border: "none" }}
-                                  >
-                                    Cancel Booking
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
+                          {b.status !== "pending" && (
+                            <span className="text-xs" style={mutedText}>—</span>
                           )}
                         </div>
                       </TableCell>
@@ -282,6 +312,42 @@ const AdminDashboard = () => {
           </div>
         )}
       </div>
+
+      {/* Decline Reason Dialog */}
+      <Dialog open={declineDialogOpen} onOpenChange={setDeclineDialogOpen}>
+        <DialogContent style={{ background: "hsl(30 10% 18%)", border: "1px solid hsl(30 10% 25%)", color: "hsl(40 30% 85%)" }}>
+          <DialogHeader>
+            <DialogTitle style={goldText}>Decline Booking</DialogTitle>
+            <DialogDescription style={mutedText}>
+              Please provide a reason for declining {declineBooking?.guest_name}'s reservation. This will be sent to the guest via email.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            value={declineReason}
+            onChange={(e) => setDeclineReason(e.target.value)}
+            placeholder="Enter the reason for declining this booking..."
+            className="border-none min-h-[100px]"
+            style={{ background: "hsl(30 10% 22%)", color: "hsl(40 30% 85%)" }}
+          />
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={() => setDeclineDialogOpen(false)}
+              style={{ color: "hsl(30 10% 55%)" }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDecline}
+              disabled={!declineReason.trim() || updatingId === declineBooking?.id}
+              style={{ background: "hsl(0 70% 45%)", color: "white", border: "none" }}
+            >
+              {updatingId === declineBooking?.id ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : null}
+              Decline Booking
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
