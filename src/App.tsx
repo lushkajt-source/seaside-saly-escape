@@ -46,6 +46,7 @@ const AppLayout = () => {
         </Routes>
       </main>
       {!hideChrome && <Footer />}
+      {!hideChrome && <WhatsAppButton />}
     </>
   );
 };
