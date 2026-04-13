@@ -52,6 +52,9 @@ const AdminDashboard = () => {
   const [declineDialogOpen, setDeclineDialogOpen] = useState(false);
   const [declineBooking, setDeclineBooking] = useState<Booking | null>(null);
   const [declineReason, setDeclineReason] = useState("");
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [cancelBooking, setCancelBooking] = useState<Booking | null>(null);
+  const [cancelReason, setCancelReason] = useState("");
 
   const fetchBookings = async () => {
     setLoading(true);
