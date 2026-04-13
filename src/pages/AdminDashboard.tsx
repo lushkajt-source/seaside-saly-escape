@@ -102,7 +102,13 @@ const AdminDashboard = () => {
       const updatedBooking = bookings.find((b) => b.id === id);
       if (updatedBooking) {
         const bookingWithUpdate = { ...updatedBooking, status: newStatus, decline_reason: reason || null };
-        sendEmail(newStatus === "confirmed" ? "confirmed" : "declined", bookingWithUpdate);
+        if (newStatus === "confirmed") {
+          sendEmail("confirmed", bookingWithUpdate);
+        } else if (newStatus === "declined") {
+          sendEmail("declined", bookingWithUpdate);
+        } else if (newStatus === "cancelled") {
+          sendEmail("cancelled", bookingWithUpdate);
+        }
       }
       setBookings((prev) =>
         prev.map((b) => (b.id === id ? { ...b, status: newStatus, decline_reason: reason || b.decline_reason } : b))
