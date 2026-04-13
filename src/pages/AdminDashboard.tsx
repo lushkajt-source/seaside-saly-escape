@@ -339,6 +339,7 @@ const AdminDashboard = () => {
                           {(b.status === "declined" || b.status === "cancelled") && (
                             <span className="text-xs" style={mutedText}>—</span>
                           )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
