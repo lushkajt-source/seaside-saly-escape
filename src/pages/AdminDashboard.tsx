@@ -117,6 +117,17 @@ const AdminDashboard = () => {
     setUpdatingId(null);
   };
 
+  const handleCancel = () => {
+    if (!cancelBooking || !cancelReason.trim()) {
+      toast.error("Please enter a reason for cancellation");
+      return;
+    }
+    updateStatus(cancelBooking.id, "cancelled", cancelReason.trim());
+    setCancelDialogOpen(false);
+    setCancelBooking(null);
+    setCancelReason("");
+  };
+
   const handleDecline = () => {
     if (!declineBooking || !declineReason.trim()) {
       toast.error("Please enter a reason for declining");
