@@ -52,6 +52,9 @@ const AdminDashboard = () => {
   const [declineDialogOpen, setDeclineDialogOpen] = useState(false);
   const [declineBooking, setDeclineBooking] = useState<Booking | null>(null);
   const [declineReason, setDeclineReason] = useState("");
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [cancelBooking, setCancelBooking] = useState<Booking | null>(null);
+  const [cancelReason, setCancelReason] = useState("");
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -99,13 +102,30 @@ const AdminDashboard = () => {
       const updatedBooking = bookings.find((b) => b.id === id);
       if (updatedBooking) {
         const bookingWithUpdate = { ...updatedBooking, status: newStatus, decline_reason: reason || null };
-        sendEmail(newStatus === "confirmed" ? "confirmed" : "declined", bookingWithUpdate);
+        if (newStatus === "confirmed") {
+          sendEmail("confirmed", bookingWithUpdate);
+        } else if (newStatus === "declined") {
+          sendEmail("declined", bookingWithUpdate);
+        } else if (newStatus === "cancelled") {
+          sendEmail("cancelled", bookingWithUpdate);
+        }
       }
       setBookings((prev) =>
         prev.map((b) => (b.id === id ? { ...b, status: newStatus, decline_reason: reason || b.decline_reason } : b))
       );
     }
     setUpdatingId(null);
+  };
+
+  const handleCancel = () => {
+    if (!cancelBooking || !cancelReason.trim()) {
+      toast.error("Please enter a reason for cancellation");
+      return;
+    }
+    updateStatus(cancelBooking.id, "cancelled", cancelReason.trim());
+    setCancelDialogOpen(false);
+    setCancelBooking(null);
+    setCancelReason("");
   };
 
   const handleDecline = () => {
@@ -205,6 +225,7 @@ const AdminDashboard = () => {
               <SelectItem value="pending">Pending</SelectItem>
               <SelectItem value="confirmed">Confirmed</SelectItem>
               <SelectItem value="declined">Declined</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
             </SelectContent>
           </Select>
           <Input
@@ -299,7 +320,23 @@ const AdminDashboard = () => {
                               </Button>
                             </>
                           )}
-                          {b.status !== "pending" && (
+                          {b.status === "confirmed" && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              disabled={updatingId === b.id}
+                              onClick={() => {
+                                setCancelBooking(b);
+                                setCancelReason("");
+                                setCancelDialogOpen(true);
+                              }}
+                              className="text-xs"
+                              style={{ color: "hsl(0 70% 55%)", background: "hsl(0 70% 50% / 0.1)" }}
+                            >
+                              {updatingId === b.id ? <Loader2 className="w-3 h-3 animate-spin" /> : "Cancel"}
+                            </Button>
+                          )}
+                          {(b.status === "declined" || b.status === "cancelled") && (
                             <span className="text-xs" style={mutedText}>—</span>
                           )}
                         </div>
@@ -344,6 +381,42 @@ const AdminDashboard = () => {
             >
               {updatingId === declineBooking?.id ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : null}
               Decline Booking
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Cancel Reason Dialog */}
+      <Dialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <DialogContent style={{ background: "hsl(30 10% 18%)", border: "1px solid hsl(30 10% 25%)", color: "hsl(40 30% 85%)" }}>
+          <DialogHeader>
+            <DialogTitle style={goldText}>Cancel Booking</DialogTitle>
+            <DialogDescription style={mutedText}>
+              Please provide a reason for cancelling {cancelBooking?.guest_name}'s confirmed reservation. The guest will be notified via email.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            value={cancelReason}
+            onChange={(e) => setCancelReason(e.target.value)}
+            placeholder="Enter the reason for cancelling this booking..."
+            className="border-none min-h-[100px]"
+            style={{ background: "hsl(30 10% 22%)", color: "hsl(40 30% 85%)" }}
+          />
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={() => setCancelDialogOpen(false)}
+              style={{ color: "hsl(30 10% 55%)" }}
+            >
+              Go Back
+            </Button>
+            <Button
+              onClick={handleCancel}
+              disabled={!cancelReason.trim() || updatingId === cancelBooking?.id}
+              style={{ background: "hsl(0 70% 45%)", color: "white", border: "none" }}
+            >
+              {updatingId === cancelBooking?.id ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : null}
+              Cancel Booking
             </Button>
           </DialogFooter>
         </DialogContent>
