@@ -320,9 +320,24 @@ const AdminDashboard = () => {
                               </Button>
                             </>
                           )}
-                          {b.status !== "pending" && (
-                            <span className="text-xs" style={mutedText}>—</span>
+                          {b.status === "confirmed" && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              disabled={updatingId === b.id}
+                              onClick={() => {
+                                setCancelBooking(b);
+                                setCancelReason("");
+                                setCancelDialogOpen(true);
+                              }}
+                              className="text-xs"
+                              style={{ color: "hsl(0 70% 55%)", background: "hsl(0 70% 50% / 0.1)" }}
+                            >
+                              {updatingId === b.id ? <Loader2 className="w-3 h-3 animate-spin" /> : "Cancel"}
+                            </Button>
                           )}
+                          {(b.status === "declined" || b.status === "cancelled") && (
+                            <span className="text-xs" style={mutedText}>—</span>
                         </div>
                       </TableCell>
                     </TableRow>
