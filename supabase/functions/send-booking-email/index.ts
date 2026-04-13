@@ -108,6 +108,34 @@ Deno.serve(async (req) => {
           <p style="color: #888; font-size: 13px;">Best regards,<br/>The Saly Hotel Team</p>
         </div>
       `;
+    } else if (type === "cancelled") {
+      to = email;
+      subject = "Reservation Cancelled - Saly Hotel";
+      const cancelReason = booking.decline_reason || "No reason provided";
+      html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #faf8f5; padding: 30px;">
+          <h1 style="color: #1e1c19; font-family: Georgia, serif; border-bottom: 2px solid #c4a44a; padding-bottom: 10px;">
+            Reservation Cancelled
+          </h1>
+          <p style="font-size: 16px; color: #333; line-height: 1.6;">
+            Dear ${guestName},
+          </p>
+          <p style="font-size: 16px; color: #333; line-height: 1.6;">
+            We regret to inform you that your previously confirmed reservation has been cancelled.
+          </p>
+          <div style="background: #fff3f3; border-left: 4px solid #e74c3c; padding: 15px; margin: 20px 0; border-radius: 4px;">
+            <strong>Reason:</strong> ${cancelReason}
+          </div>
+          <table style="width: 100%; border-collapse: collapse; margin: 20px 0; background: white; padding: 15px; border-radius: 8px;">
+            <tr><td style="padding: 8px 15px; color: #888;">Check-in</td><td style="padding: 8px 15px;">${checkIn}</td></tr>
+            <tr><td style="padding: 8px 15px; color: #888;">Check-out</td><td style="padding: 8px 15px;">${checkOut}</td></tr>
+          </table>
+          <p style="font-size: 16px; color: #333; line-height: 1.6;">
+            Please feel free to contact us for alternative options at +355 69 452 8003 or via WhatsApp at +44 7777 737080.
+          </p>
+          <p style="color: #888; font-size: 13px;">Best regards,<br/>The Saly Hotel Team</p>
+        </div>
+      `;
     } else {
       return new Response(JSON.stringify({ error: "Invalid type" }), {
         status: 400,
