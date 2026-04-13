@@ -385,6 +385,42 @@ const AdminDashboard = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Cancel Reason Dialog */}
+      <Dialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <DialogContent style={{ background: "hsl(30 10% 18%)", border: "1px solid hsl(30 10% 25%)", color: "hsl(40 30% 85%)" }}>
+          <DialogHeader>
+            <DialogTitle style={goldText}>Cancel Booking</DialogTitle>
+            <DialogDescription style={mutedText}>
+              Please provide a reason for cancelling {cancelBooking?.guest_name}'s confirmed reservation. The guest will be notified via email.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            value={cancelReason}
+            onChange={(e) => setCancelReason(e.target.value)}
+            placeholder="Enter the reason for cancelling this booking..."
+            className="border-none min-h-[100px]"
+            style={{ background: "hsl(30 10% 22%)", color: "hsl(40 30% 85%)" }}
+          />
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={() => setCancelDialogOpen(false)}
+              style={{ color: "hsl(30 10% 55%)" }}
+            >
+              Go Back
+            </Button>
+            <Button
+              onClick={handleCancel}
+              disabled={!cancelReason.trim() || updatingId === cancelBooking?.id}
+              style={{ background: "hsl(0 70% 45%)", color: "white", border: "none" }}
+            >
+              {updatingId === cancelBooking?.id ? <Loader2 className="w-3 h-3 animate-spin mr-2" /> : null}
+              Cancel Booking
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
