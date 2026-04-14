@@ -17,12 +17,13 @@ import RoomDetail from "./pages/RoomDetail";
 import Restaurant from "./pages/Restaurant";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
+import EmployeeDashboard from "./pages/EmployeeDashboard";
 
 const queryClient = new QueryClient();
 
 const AppLayout = () => {
   const location = useLocation();
-  const hideChrome = location.pathname.startsWith("/admin");
+  const hideChrome = location.pathname.startsWith("/admin") || location.pathname.startsWith("/employee");
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -42,6 +43,7 @@ const AppLayout = () => {
           <Route path="/contact" element={<Contact />} />
           <Route path="/admin-login" element={<AdminLogin />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/employee" element={<EmployeeDashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

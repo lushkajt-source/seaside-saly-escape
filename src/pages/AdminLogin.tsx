@@ -30,7 +30,6 @@ const AdminLogin = () => {
       return;
     }
 
-    // Check admin role
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       toast.error("Authentication failed");
@@ -38,22 +37,37 @@ const AdminLogin = () => {
       return;
     }
 
-    const { data: roleData } = await supabase
-      .from("user_roles" as any)
+    // Check admin role
+    const { data: adminRole } = await supabase
+      .from("user_roles")
       .select("role")
       .eq("user_id", user.id)
       .eq("role", "admin")
       .maybeSingle();
 
-    if (!roleData) {
-      await supabase.auth.signOut();
-      toast.error("Access denied. Admin privileges required.");
-      setLoading(false);
+    if (adminRole) {
+      toast.success("Welcome back, Admin!");
+      navigate("/admin-dashboard", { replace: true });
       return;
     }
 
-    toast.success("Welcome back, Admin!");
-    navigate("/admin-dashboard", { replace: true });
+    // Check employee role (stored as 'user' in app_role enum)
+    const { data: empRole } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id)
+      .eq("role", "user")
+      .maybeSingle();
+
+    if (empRole) {
+      toast.success("Welcome back!");
+      navigate("/employee", { replace: true });
+      return;
+    }
+
+    await supabase.auth.signOut();
+    toast.error("Access denied. No valid role assigned.");
+    setLoading(false);
   };
 
   return (
@@ -64,7 +78,7 @@ const AdminLogin = () => {
             <Lock className="w-8 h-8 text-white" />
           </div>
           <CardTitle className="text-2xl font-serif" style={{ fontFamily: "'Cormorant Garamond', serif", color: "hsl(38 55% 55%)" }}>
-            Admin Portal
+            Staff Portal
           </CardTitle>
           <p className="text-sm" style={{ color: "hsl(30 10% 55%)" }}>Hotel Saly — Management System</p>
         </CardHeader>
@@ -72,34 +86,13 @@ const AdminLogin = () => {
           <form onSubmit={handleLogin} className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor="email" style={{ color: "hsl(38 55% 55%)" }}>Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@hotelsaly.com"
-                className="border-none"
-                style={{ background: "hsl(30 10% 20%)", color: "hsl(40 30% 90%)" }}
-              />
+              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="staff@hotelsaly.com" className="border-none" style={{ background: "hsl(30 10% 20%)", color: "hsl(40 30% 90%)" }} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password" style={{ color: "hsl(38 55% 55%)" }}>Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="border-none"
-                style={{ background: "hsl(30 10% 20%)", color: "hsl(40 30% 90%)" }}
-              />
+              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="border-none" style={{ background: "hsl(30 10% 20%)", color: "hsl(40 30% 90%)" }} />
             </div>
-            <Button
-              type="submit"
-              disabled={loading}
-              className="w-full text-white border-none"
-              style={{ background: "linear-gradient(135deg, hsl(38 55% 55%), hsl(38 45% 40%))" }}
-            >
+            <Button type="submit" disabled={loading} className="w-full text-white border-none" style={{ background: "linear-gradient(135deg, hsl(38 55% 55%), hsl(38 45% 40%))" }}>
               {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
               Sign In
             </Button>

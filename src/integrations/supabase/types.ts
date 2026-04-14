@@ -29,6 +29,7 @@ export type Database = {
           phone: string | null
           room_id: string
           room_type: string | null
+          source: string | null
           special_request: string | null
           status: string
         }
@@ -46,6 +47,7 @@ export type Database = {
           phone?: string | null
           room_id: string
           room_type?: string | null
+          source?: string | null
           special_request?: string | null
           status?: string
         }
@@ -63,6 +65,7 @@ export type Database = {
           phone?: string | null
           room_id?: string
           room_type?: string | null
+          source?: string | null
           special_request?: string | null
           status?: string
         }
