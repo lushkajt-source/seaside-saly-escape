@@ -18,7 +18,9 @@ export type Database = {
         Row: {
           check_in: string
           check_out: string
+          confirmed_by: string | null
           created_at: string
+          created_by: string | null
           decline_reason: string | null
           guest_email: string | null
           guest_name: string
@@ -33,7 +35,9 @@ export type Database = {
         Insert: {
           check_in: string
           check_out: string
+          confirmed_by?: string | null
           created_at?: string
+          created_by?: string | null
           decline_reason?: string | null
           guest_email?: string | null
           guest_name: string
@@ -48,7 +52,9 @@ export type Database = {
         Update: {
           check_in?: string
           check_out?: string
+          confirmed_by?: string | null
           created_at?: string
+          created_by?: string | null
           decline_reason?: string | null
           guest_email?: string | null
           guest_name?: string
