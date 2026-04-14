@@ -55,6 +55,7 @@ const BookingForm = ({ open, onClose, roomType }: Props) => {
         const { data: conflicting, error: bookErr } = await supabase
           .from("bookings")
           .select("room_id")
+          .in("status", ["pending", "confirmed"])
           .lt("check_in", formData.checkout)
           .gt("check_out", formData.checkin);
         if (bookErr) throw bookErr;
@@ -99,6 +100,7 @@ const BookingForm = ({ open, onClose, roomType }: Props) => {
         .from("bookings")
         .select("id")
         .eq("room_id", formData.room_id)
+        .in("status", ["pending", "confirmed"])
         .lt("check_in", formData.checkout)
         .gt("check_out", formData.checkin);
 
