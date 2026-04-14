@@ -32,6 +32,8 @@ interface Booking {
   special_request: string | null;
   decline_reason: string | null;
   created_at: string;
+  created_by: string | null;
+  confirmed_by: string | null;
 }
 
 const statusColors: Record<string, { bg: string; text: string }> = {
@@ -42,7 +44,7 @@ const statusColors: Record<string, { bg: string; text: string }> = {
 };
 
 const AdminDashboard = () => {
-  const { user, loading: authLoading, signOut } = useAuth(true);
+  const { user, isAdmin, loading: authLoading, signOut } = useAuth(true);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -89,6 +91,10 @@ const AdminDashboard = () => {
     setUpdatingId(id);
     const updateData: any = { status: newStatus };
     if (reason) updateData.decline_reason = reason;
+    // Track who confirmed the booking
+    if (newStatus === "confirmed" && user) {
+      updateData.confirmed_by = user.id;
+    }
 
     const { error } = await supabase
       .from("bookings")
@@ -111,10 +117,25 @@ const AdminDashboard = () => {
         }
       }
       setBookings((prev) =>
-        prev.map((b) => (b.id === id ? { ...b, status: newStatus, decline_reason: reason || b.decline_reason } : b))
+        prev.map((b) =>
+          b.id === id
+            ? {
+                ...b,
+                status: newStatus,
+                decline_reason: reason || b.decline_reason,
+                confirmed_by: newStatus === "confirmed" && user ? user.id : b.confirmed_by,
+              }
+            : b
+        )
       );
     }
     setUpdatingId(null);
+  };
+
+  // Employees can only cancel bookings they confirmed
+  const canCancelBooking = (booking: Booking): boolean => {
+    if (isAdmin) return true;
+    return booking.confirmed_by === user?.id;
   };
 
   const handleCancel = () => {
@@ -146,7 +167,9 @@ const AdminDashboard = () => {
         b.guest_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (b.guest_email?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
       const matchesStatus = statusFilter === "all" || b.status === statusFilter;
-      const matchesDate = !dateFilter || b.check_in === dateFilter;
+      // Filter by created_at date (not check_in)
+      const matchesDate =
+        !dateFilter || format(new Date(b.created_at), "yyyy-MM-dd") === dateFilter;
       return matchesSearch && matchesStatus && matchesDate;
     });
   }, [bookings, searchTerm, statusFilter, dateFilter]);
@@ -320,7 +343,7 @@ const AdminDashboard = () => {
                               </Button>
                             </>
                           )}
-                          {b.status === "confirmed" && (
+                          {b.status === "confirmed" && canCancelBooking(b) && (
                             <Button
                               size="sm"
                               variant="ghost"
