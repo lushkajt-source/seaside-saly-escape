@@ -340,7 +340,7 @@ const EmployeeDashboard = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          {b.status === "pending" && b.created_by === user?.id && (
+                          {b.status === "pending" && (
                             <Button size="sm" disabled={updatingId === b.id} onClick={() => updateStatus(b.id, "confirmed")} className="text-xs border-none text-white" style={{ background: "hsl(142 50% 35%)" }}>
                               {updatingId === b.id ? <Loader2 className="w-3 h-3 animate-spin" /> : "Confirm"}
                             </Button>
