@@ -40,7 +40,7 @@ const Restaurant = () => {
               Saly Restaurant
             </h1>
             <p
-              className="font-display text-lg md:text-xl text-white/60 italic font-light mb-8 animate-fade-up"
+              className="font-display text-lg md:text-xl text-black/60 italic font-light mb-8 animate-fade-up"
               style={{ animationDelay: "0.4s" }}
             >
               Mediterranean dining by the Adriatic
