@@ -79,16 +79,22 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* Mobile menu */}
+{/* Mobile menu */}
       {open && (
-        <div className="md:hidden bg-background/98 backdrop-blur-md border-t border-border animate-fade-in">
+        <div className={`md:hidden backdrop-blur-md border-t animate-fade-in ${
+          scrolled 
+            ? "bg-background/98 border-border" 
+            : "bg-foreground/80 border-white/20"
+        }`}>
           <div className="container py-6 flex flex-col gap-1">
             {links.map((l) => (
               <Link
                 key={l.to}
                 to={l.to}
                 className={`font-body text-base py-3 px-4 rounded-xl transition-all duration-200 ${
-                  location.pathname === l.to ? "text-foreground bg-secondary font-semibold" : "text-foreground/70 hover:bg-muted"
+                  location.pathname === l.to 
+                    ? (scrolled ? "text-foreground bg-secondary font-semibold" : "text-white bg-white/20 font-semibold")
+                    : (scrolled ? "text-foreground/70 hover:bg-muted" : "text-white/80 hover:bg-white/10")
                 }`}
               >
                 {l.label}
@@ -96,7 +102,11 @@ const Navbar = () => {
             ))}
             <Link
               to="/contact"
-              className="bg-foreground text-background px-6 py-3.5 rounded-full text-center font-medium tracking-[0.1em] uppercase mt-4"
+              className={`px-6 py-3.5 rounded-full text-center font-medium tracking-[0.1em] uppercase mt-4 transition-all duration-200 ${
+                scrolled
+                  ? "bg-foreground text-background"
+                  : "bg-white text-foreground"
+              }`}
             >
               Book Now
             </Link>
