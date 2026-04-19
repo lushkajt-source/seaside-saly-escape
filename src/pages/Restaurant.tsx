@@ -24,7 +24,7 @@ const Restaurant = () => {
           alt="Saly Restaurant seaside terrace"
           className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/30" />
         <div className="container relative z-10 pb-20 md:pb-28">
           <div className="max-w-lg">
             <p
