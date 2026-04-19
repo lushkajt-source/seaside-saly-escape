@@ -199,7 +199,7 @@ const Index = () => {
               <h2 className="font-display text-4xl md:text-6xl text-white font-light leading-[1.05] mb-3">
                 Saly Restaurant
               </h2>
-              <p className="font-display text-lg md:text-xl text-white/60 italic font-light mb-8">
+              <p className="font-display text-lg md:text-xl text-white/60 italic font-light mb-6">
                 Mediterranean dining by the sea
               </p>
               <p className="text-white/50 leading-[1.9] text-[15px] font-light mb-10">
