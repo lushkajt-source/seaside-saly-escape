@@ -51,11 +51,13 @@ const RestaurantBookingForm = ({ open, onClose }: Props) => {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-foreground/60 backdrop-blur-sm animate-fade-in p-4">
       <div className="bg-card rounded-2xl shadow-premium-xl max-w-lg w-full relative overflow-hidden animate-scale-in">
+        {/* Close button - more prominent */}
         <button
           onClick={handleClose}
-          className="absolute top-4 right-4 w-9 h-9 rounded-full bg-muted/80 hover:bg-destructive hover:text-destructive-foreground flex items-center justify-center transition-all duration-200 z-10"
-          aria-label="Close"
+          className="absolute top-3 right-3 z-20 flex items-center gap-2 px-3 py-2 rounded-full bg-muted/90 hover:bg-destructive hover:text-destructive-foreground transition-all duration-200 shadow-lg border border-border/50"
+          aria-label="Close reservation form"
         >
+          <span className="text-xs font-medium hidden sm:inline">Close</span>
           <X size={18} strokeWidth={2.5} />
         </button>
 
