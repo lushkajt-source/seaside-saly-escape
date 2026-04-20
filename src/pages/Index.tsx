@@ -44,7 +44,7 @@ const Index = () => {
           alt="Hotel Saly beachfront at golden hour on the Adriatic"
           className="absolute inset-0 w-full h-full object-cover animate-slow-zoom"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/50" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/20 to-black/50" />
         <div className="relative z-10 text-center px-6 max-w-3xl">
           <p
             className="font-body text-[11px] tracking-[0.5em] uppercase text-white/50 mb-6 animate-fade-up"
